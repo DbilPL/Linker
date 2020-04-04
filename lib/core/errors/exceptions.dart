@@ -3,3 +3,9 @@ class CacheException implements Exception {
 
   CacheException(this.error);
 }
+
+class ConnectionException implements Exception {
+  final String error;
+
+  ConnectionException(this.error);
+}
