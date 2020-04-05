@@ -21,7 +21,6 @@ void main() {
   AuthenticationDataSourceImpl dataSource;
 
   final tUserModel = UserModel(
-    name: 'Test',
     email: 'for_testing@gmail.com',
     password: '1234567',
     uid: 'aabbcc',
@@ -36,7 +35,6 @@ void main() {
         'groups': [],
         'links': [],
         'types': [],
-        'name': tUserModel.name,
       },
     );
     mockFirebaseAuth = MockFirebaseAuth();

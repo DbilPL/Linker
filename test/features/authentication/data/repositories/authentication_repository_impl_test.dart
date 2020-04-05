@@ -26,7 +26,6 @@ void main() {
     );
   });
   final tUserModel = UserModel(
-    name: 'wowowoo',
     email: 'yayayaya',
     password: 'asojndjvbhdisb',
     uid: 'kfjndsicidsisndisc',

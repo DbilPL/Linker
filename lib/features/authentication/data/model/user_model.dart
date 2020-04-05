@@ -2,10 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:linker/features/authentication/domain/entities/user.dart';
 
 class UserModel extends User {
-  final String name, email, password, uid;
+  final String email, password, uid;
 
   UserModel({
-    @required this.name,
     @required this.email,
     @required this.password,
     this.uid,
@@ -18,7 +17,6 @@ class UserModel extends User {
     return {
       'password': this.password,
       'email': this.email,
-      'name': this.name,
     };
   }
 
@@ -26,7 +24,6 @@ class UserModel extends User {
     return UserModel(
       password: json['password'],
       email: json['email'],
-      name: json['name'],
     );
   }
 }

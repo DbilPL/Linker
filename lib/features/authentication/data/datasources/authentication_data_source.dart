@@ -54,7 +54,6 @@ class AuthenticationDataSourceImpl extends AuthenticationDataSource {
       });
 
       final newUser = UserModel(
-        name: name,
         email: email,
         password: password,
         uid: user.uid,
@@ -78,13 +77,7 @@ class AuthenticationDataSourceImpl extends AuthenticationDataSource {
       if (authResult != null) {
         final FirebaseUser user = authResult.user;
 
-        final CollectionReference collection = firestore.collection('users');
-
-        final DocumentSnapshot documentSnapshot =
-            await collection.document(user.uid).get();
-
         final newUser = UserModel(
-          name: documentSnapshot.data['name'],
           email: email,
           password: password,
           uid: user.uid,
@@ -115,7 +108,6 @@ class AuthenticationDataSourceImpl extends AuthenticationDataSource {
       final FirebaseUser fUser = authResult.user;
 
       return UserModel(
-        name: user.name,
         email: user.email,
         password: user.password,
         uid: fUser.uid,
@@ -135,4 +127,25 @@ class AuthenticationDataSourceImpl extends AuthenticationDataSource {
       throw Exception();
     }
   }
+
+  ///
+
+//  @override
+//  Future<Stream<DocumentSnapshot>> getUserDataStream({String uid}) async {
+//    try {
+//      final Stream<DocumentSnapshot> documentSnapshot =
+//          firestore.collection('users').document(uid).snapshots();
+//
+////      documentSnapshot.listen((data) {
+////        data.reference.updateData({
+////          some data
+////        });
+////      });
+//
+//      return documentSnapshot;
+//    } catch (e) {
+//      print(e);
+//      throw Exception();
+//    }
+//  }
 }

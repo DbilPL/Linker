@@ -17,8 +17,8 @@ void main() {
     usecase = Register(repository);
   });
 
-  final tUserModel = UserModel(
-      name: 'ljcndjckjd', email: 'asdljndcdsjcn', password: 'kcjnsdjcnjncjd');
+  final tUserModel =
+      UserModel(email: 'asdljndcdsjcn', password: 'kcjnsdjcnjncjd');
 
   test('should return user model', () async {
     when(repository.register(

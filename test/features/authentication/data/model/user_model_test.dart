@@ -3,12 +3,11 @@ import 'package:linker/features/authentication/data/model/user_model.dart';
 import 'package:linker/features/authentication/domain/entities/user.dart';
 
 void main() {
-  final tUserModel = UserModel(
-      password: 'hbwwuicbw', email: 'something@gmail.com', name: 'PAZHYLOJ');
+  final tUserModel =
+      UserModel(password: 'hbwwuicbw', email: 'something@gmail.com');
   final tJson = {
     'password': 'hbwwuicbw',
     'email': 'something@gmail.com',
-    'name': 'PAZHYLOJ'
   };
 
   group('testing user model', () {
