@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:linker/core/errors/exceptions.dart';
 import 'package:linker/core/errors/failure.dart';
 import 'package:linker/features/authentication/data/model/user_model.dart';
 import 'package:linker/features/authentication/domain/entities/user.dart';
@@ -64,6 +65,7 @@ class AuthenticationDataSourceImpl extends AuthenticationDataSource {
 
       return newUser;
     } catch (e) {
+      print(e);
       throw Exception();
     }
   }
@@ -73,23 +75,26 @@ class AuthenticationDataSourceImpl extends AuthenticationDataSource {
     try {
       final AuthResult authResult = await firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
+      if (authResult != null) {
+        final FirebaseUser user = authResult.user;
 
-      final FirebaseUser user = authResult.user;
+        final CollectionReference collection = firestore.collection('users');
 
-      final CollectionReference collection = firestore.collection('users');
+        final DocumentSnapshot documentSnapshot =
+            await collection.document(user.uid).get();
 
-      final DocumentSnapshot documentSnapshot =
-          await collection.document(user.uid).get();
+        final newUser = UserModel(
+          name: documentSnapshot.data['name'],
+          email: email,
+          password: password,
+          uid: user.uid,
+        );
 
-      final newUser = UserModel(
-        name: documentSnapshot.data['name'],
-        email: email,
-        password: password,
-        uid: user.uid,
-      );
-
-      return newUser;
+        return newUser;
+      } else
+        throw NoUserException();
     } catch (e) {
+      print(e);
       throw Exception();
     }
   }
@@ -116,6 +121,7 @@ class AuthenticationDataSourceImpl extends AuthenticationDataSource {
         uid: fUser.uid,
       );
     } catch (e) {
+      print(e);
       throw Exception();
     }
   }
@@ -125,6 +131,7 @@ class AuthenticationDataSourceImpl extends AuthenticationDataSource {
     try {
       return await firebaseAuth.signOut();
     } catch (e) {
+      print(e);
       throw Exception();
     }
   }

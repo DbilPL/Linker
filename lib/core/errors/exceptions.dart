@@ -9,3 +9,7 @@ class ConnectionException implements Exception {
 
   ConnectionException(this.error);
 }
+
+class NoUserException implements Exception {
+  NoUserException();
+}
