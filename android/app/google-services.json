@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "618372408291",
+    "firebase_url": "https://linker-f11a6.firebaseio.com",
+    "project_id": "linker-f11a6",
+    "storage_bucket": "linker-f11a6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:618372408291:android:2ac3ddfe5a2773158e36d6",
+        "android_client_info": {
+          "package_name": "com.example.linker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "618372408291-rldq3qjobb55gg37ksvr9qu8gbkdib4r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaihZYQWiRVJ9RSvTPsClcPLxsARf9RB0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "618372408291-rldq3qjobb55gg37ksvr9qu8gbkdib4r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

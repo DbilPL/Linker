@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:linker/core/errors/failure.dart';
@@ -31,27 +33,99 @@ class AuthenticationDataSourceImpl extends AuthenticationDataSource {
   AuthenticationDataSourceImpl(
       {this.sharedPreferences, this.firebaseAuth, this.firestore});
 
+  static const _authenticationKey = 'AUTH_KEY';
+
   @override
-  Future<User> register({String email, String password, String name}) {
-    // TODO: implement register
-    return null;
+  Future<User> register({String email, String password, String name}) async {
+    try {
+      final AuthResult authResult = await firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: password);
+
+      final FirebaseUser user = authResult.user;
+
+      final CollectionReference collection = firestore.collection('users');
+
+      await collection.document(user.uid).setData({
+        'groups': [],
+        'links': [],
+        'name': name,
+        'types': [],
+      });
+
+      final newUser = UserModel(
+        name: name,
+        email: email,
+        password: password,
+        uid: user.uid,
+      );
+
+      await sharedPreferences.setString(
+          _authenticationKey, jsonEncode(newUser.toJson()));
+
+      return newUser;
+    } catch (e) {
+      throw Exception();
+    }
   }
 
   @override
-  Future<User> signIn({String email, String password}) {
-    // TODO: implement signIn
-    return null;
+  Future<User> signIn({String email, String password}) async {
+    try {
+      final AuthResult authResult = await firebaseAuth
+          .signInWithEmailAndPassword(email: email, password: password);
+
+      final FirebaseUser user = authResult.user;
+
+      final CollectionReference collection = firestore.collection('users');
+
+      final DocumentSnapshot documentSnapshot =
+          await collection.document(user.uid).get();
+
+      final newUser = UserModel(
+        name: documentSnapshot.data['name'],
+        email: email,
+        password: password,
+        uid: user.uid,
+      );
+
+      return newUser;
+    } catch (e) {
+      throw Exception();
+    }
   }
 
   @override
-  Future<User> signInAuto() {
-    // TODO: implement signInAuto
-    return null;
+  Future<User> signInAuto() async {
+    try {
+      final UserModel user = UserModel.fromJson(
+        json: jsonDecode(
+          sharedPreferences.getString(_authenticationKey),
+        ),
+      );
+
+      final AuthResult authResult =
+          await firebaseAuth.signInWithEmailAndPassword(
+              email: user.email, password: user.password);
+
+      final FirebaseUser fUser = authResult.user;
+
+      return UserModel(
+        name: user.name,
+        email: user.email,
+        password: user.password,
+        uid: fUser.uid,
+      );
+    } catch (e) {
+      throw Exception();
+    }
   }
 
   @override
-  Future<void> signOut() {
-    // TODO: implement signOut
-    return null;
+  Future<void> signOut() async {
+    try {
+      return await firebaseAuth.signOut();
+    } catch (e) {
+      throw Exception();
+    }
   }
 }
