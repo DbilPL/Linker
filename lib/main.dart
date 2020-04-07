@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:linker/features/authentication/presentation/pages/auth_page.dart';
 
 import 'core/bloc_delegate.dart';
 import 'injection_container.dart' as di;
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Scaffold(),
+      home: AuthPage(),
     );
   }
 }
