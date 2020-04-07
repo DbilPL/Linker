@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:linker/core/errors/failure.dart';
-import 'package:linker/features/table/data/datasources/user_data_data_source.dart';
+import 'package:linker/features/table/data/datasources/user_table_data_source.dart';
 import 'package:linker/features/table/data/model/user_data_model.dart';
 import 'package:linker/features/table/domain/repositories/user_table_repository.dart';
 

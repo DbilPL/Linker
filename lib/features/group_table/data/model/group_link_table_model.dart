@@ -7,14 +7,20 @@ class GroupLinkTableModel extends GroupLinkTable {
   final List<LinkTypeModel> types;
   final String creatorUid;
   final String tableName;
+  final List<String> usersOfGroup;
 
   GroupLinkTableModel(
-      {this.links, this.types, this.creatorUid, this.tableName});
+      {this.links,
+      this.types,
+      this.creatorUid,
+      this.tableName,
+      this.usersOfGroup});
 
   static GroupLinkTableModel fromJson(Map<String, dynamic> json) {
     return GroupLinkTableModel(
       creatorUid: json['creator_uid'],
       tableName: json['table_name'],
+      usersOfGroup: json['users_of_group'],
       links: json['links'].map((v) => LinkModel.fromJson(v)).toList(),
       types: json['types'].map((v) => LinkTypeModel.fromJson(v)).toList(),
     );
@@ -26,6 +32,7 @@ class GroupLinkTableModel extends GroupLinkTable {
       'types': this.types.map((val) => val.toJson()).toList(),
       'creator_uid': this.creatorUid,
       'table_name': this.tableName,
+      'users_of_group': this.usersOfGroup,
     };
   }
 

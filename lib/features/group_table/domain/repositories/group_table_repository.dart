@@ -5,10 +5,10 @@ import 'package:linker/features/group_table/domain/entities/group_link_table.dar
 
 abstract class GroupTableRepository {
   Future<Either<Failure, Stream<DocumentSnapshot>>> getGroupTableStream(
-      {String uid});
+      {String tableName});
 
   Future<Either<Failure, void>> updateGroupTableData(
       {DocumentReference reference, GroupLinkTable newGroupTable});
 
-  Future<Either<Failure, String>> generateJoiningLink();
+  Future<Either<Failure, String>> generateJoiningLink({String tableName});
 }
