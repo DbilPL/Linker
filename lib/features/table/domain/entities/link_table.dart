@@ -8,6 +8,20 @@ class UserLinkTable extends Equatable {
 
   UserLinkTable({this.links, this.types});
 
+  static UserLinkTable fromJson(Map<String, dynamic> json) {
+    return UserLinkTable(
+      links: json['links'].map((v) => Link.fromJson(v)).toList(),
+      types: json['types'].map((v) => LinkType.fromJson(v)).toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'links': this.links.map((val) => val.toJson()).toList(),
+      'types': this.types.map((val) => val.toJson()).toList(),
+    };
+  }
+
   @override
   List<Object> get props => [links, types];
 }

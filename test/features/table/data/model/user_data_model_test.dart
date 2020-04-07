@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:linker/features/table/data/model/link_model.dart';
+import 'package:linker/features/table/data/model/link_table_model.dart';
+import 'package:linker/features/table/data/model/link_type_model.dart';
 import 'package:linker/features/table/data/model/user_data_model.dart';
-import 'package:linker/features/table/domain/entities/link.dart';
-import 'package:linker/features/table/domain/entities/link_type.dart';
 import 'package:linker/features/table/domain/entities/user_data.dart';
 
 void main() {
   final tUserDataModel = UserDataModel(
-    types: [
-      LinkType(name: 'dev', color: Colors.black, importance: 3),
-    ],
+    table: UserLinkTableModel(
+      links: [
+        LinkModel(link: 'https://kcdsovjifv.com', type: 'dev', title: 'yay'),
+      ],
+      types: [
+        LinkTypeModel(name: 'dev', color: Colors.black, importance: 3),
+      ],
+    ),
     name: 'John',
-    links: [
-      Link(link: 'https://kcdsovjifv.com', type: 'dev', title: 'yay'),
-    ],
     groupNameList: [
       'test_group',
     ],
@@ -21,20 +24,22 @@ void main() {
   final tJson = {
     'name': 'John',
     'group_names': ['test_group'],
-    'links': [
-      {
-        'link': 'https://kcdsovjifv.com',
-        'type': 'dev',
-        'title': 'yay',
-      },
-    ],
-    'types': [
-      {
-        'name': 'dev',
-        'color': [0, 0, 0],
-        'importance': 3,
-      },
-    ],
+    'user_link_table': {
+      'links': [
+        {
+          'link': 'https://kcdsovjifv.com',
+          'type': 'dev',
+          'title': 'yay',
+        },
+      ],
+      'types': [
+        {
+          'name': 'dev',
+          'color': [0, 0, 0],
+          'importance': 3,
+        },
+      ],
+    },
   };
 
   group('testing user data model', () {
