@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:linker/features/table/data/model/link_model.dart';
-import 'package:linker/features/table/data/model/link_table_model.dart';
 import 'package:linker/features/table/data/model/link_type_model.dart';
 import 'package:linker/features/table/data/model/user_data_model.dart';
+import 'package:linker/features/table/data/model/user_link_table_model.dart';
 import 'package:linker/features/table/domain/entities/user_data.dart';
 
 void main() {

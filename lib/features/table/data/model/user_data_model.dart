@@ -1,4 +1,4 @@
-import 'package:linker/features/table/data/model/link_table_model.dart';
+import 'package:linker/features/table/data/model/user_link_table_model.dart';
 import 'package:linker/features/table/domain/entities/user_data.dart';
 
 class UserDataModel extends UserData {
