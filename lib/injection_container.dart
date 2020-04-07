@@ -15,7 +15,7 @@ final sl = GetIt.instance;
 Future<void> init() async {
   // for app
   sl.registerSingleton(Firestore.instance);
-  sl.registerSingleton(SharedPreferences.getInstance());
+  sl.registerSingleton(await SharedPreferences.getInstance());
   sl.registerSingleton(FirebaseAuth.instance);
   sl.registerSingleton(DataConnectionChecker());
 
@@ -27,7 +27,7 @@ Future<void> init() async {
   ));
   sl.registerSingleton(AuthenticationRepositoryImpl(
     connectionChecker: sl<DataConnectionChecker>(),
-    dataSource: sl<AuthenticationDataSource>(),
+    dataSource: sl<AuthenticationDataSourceImpl>(),
   ));
 
   sl.registerSingleton(Register(sl<AuthenticationRepositoryImpl>()));
