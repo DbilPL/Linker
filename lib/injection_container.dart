@@ -31,7 +31,7 @@ Future<void> init() async {
   ));
   sl.registerSingleton(AuthenticationRepositoryImpl(
     connectionChecker: sl<DataConnectionChecker>(),
-    dataSource: sl<AuthenticationDataSource>(),
+    dataSource: sl<AuthenticationDataSourceImpl>(),
   ));
   sl.registerSingleton(Register(sl<AuthenticationRepositoryImpl>()));
   sl.registerSingleton(SignIn(sl<AuthenticationRepositoryImpl>()));
