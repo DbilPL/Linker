@@ -14,6 +14,11 @@ abstract class GroupTableDataSource {
   /// Generates link to join the group
   /// Throws [Exception], when something went wrong
   Future<String> generateJoiningLink({String tableName});
+
+  /// Creates new group in [Firestore] via group name and creator uid
+  /// Throws [Exception], when something went wrong
+  Future<Stream<DocumentSnapshot>> createNewGroup(
+      {String uid, String userName, String groupName});
 }
 
 class GroupTableDataSourceImpl extends GroupTableDataSource {
@@ -30,16 +35,48 @@ class GroupTableDataSourceImpl extends GroupTableDataSource {
   @override
   Future<Stream<DocumentSnapshot>> getGroupTableStream(
       {String tableName}) async {
-    final stream =
-        firestore.collection('groups').document(tableName).snapshots();
+    try {
+      final stream =
+          firestore.collection('groups').document(tableName).snapshots();
 
-    return stream;
+      return stream;
+    } catch (E) {
+      throw Exception();
+    }
   }
 
   @override
   Future<void> updateGroupTableData(
       {DocumentReference reference, GroupLinkTableModel newGroupTable}) async {
-    final success = await reference.updateData(newGroupTable.toJson());
-    return success;
+    try {
+      final success = await reference.updateData(newGroupTable.toJson());
+      return success;
+    } catch (e) {
+      throw Exception();
+    }
+  }
+
+  @override
+  Future<Stream<DocumentSnapshot>> createNewGroup(
+      {String uid, String groupName, String userName}) async {
+    try {
+      final collection = firestore.collection('groups');
+
+      final document = collection.document(groupName);
+
+      await document.setData(
+        GroupLinkTableModel(
+          tableName: groupName,
+          types: [],
+          links: [],
+          creatorUid: uid,
+          usersOfGroup: [userName],
+        ).toJson(),
+      );
+
+      return document.snapshots();
+    } catch (E) {
+      throw Exception();
+    }
   }
 }

@@ -58,4 +58,20 @@ class GroupTableRepositoryImpl extends GroupTableRepository {
       return Left(FirebaseFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, Stream<DocumentSnapshot>>> createNewGroup(
+      {String groupName, String uid, String userName}) async {
+    try {
+      if (await connectionChecker.hasConnection) {
+        final stream = await dataSource.createNewGroup(
+            uid: uid, groupName: groupName, userName: userName);
+
+        return Right(stream);
+      } else
+        return Left(ConnectionFailure());
+    } catch (e) {
+      return Left(FirebaseFailure());
+    }
+  }
 }

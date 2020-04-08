@@ -11,4 +11,10 @@ abstract class GroupTableRepository {
       {DocumentReference reference, GroupLinkTable newGroupTable});
 
   Future<Either<Failure, String>> generateJoiningLink({String tableName});
+
+  Future<Either<Failure, Stream<DocumentSnapshot>>> createNewGroup({
+    String groupName,
+    String uid,
+    String userName,
+  });
 }
