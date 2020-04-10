@@ -19,23 +19,25 @@ void main() async {
       FirebaseDynamicLinks.instance;
 
   final DynamicLinkParameters parameters = DynamicLinkParameters(
-    uriPrefix: 'https://linkerapp.page.link/groups',
-    link: Uri.parse('https://linkerapp.page.link/groups'),
+    uriPrefix: 'https://linkerapp.page.link',
+    link: Uri.parse('https://linkerapp.page.link/groups?group=test_group'),
     androidParameters: AndroidParameters(
       packageName: 'com.example.linker',
       minimumVersion: 0,
     ),
   );
 
-  final Uri url = await parameters.buildUrl();
-
-  final link = Uri.https(url.authority, url.path, {"group": "test_group"});
-
-  ///********************************************************
+  final Uri dynamicUrl = await parameters.buildUrl();
+  final ShortDynamicLink shortenedLink = await DynamicLinkParameters.shortenUrl(
+    dynamicUrl,
+    DynamicLinkParametersOptions(
+        shortDynamicLinkPathLength: ShortDynamicLinkPathLength.unguessable),
+  );
+  final Uri shortUrl = shortenedLink.shortUrl;
 
   BlocSupervisor.delegate = SimpleBlocDelegate();
   runApp(MyApp(
-    url: link,
+    url: Uri.parse("https://linkerapp.page.link" + shortUrl.path),
     firebaseDynamicLinks: firebaseDynamicLinks,
   ));
 }
@@ -60,7 +62,9 @@ class _MyAppState extends State<MyApp> {
       ),
       routes: {
         '/success': (context) => Scaffold(
-              body: Text('yay'),
+              body: Center(
+                child: Text('yay'),
+              ),
             ),
       },
       home: Home(
@@ -84,15 +88,18 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   void initState() {
-    widget.firebaseDynamicLinks.onLink(onSuccess: (url) async {
-      print(url.link.toString());
+    widget.firebaseDynamicLinks.onLink(
+      onSuccess: (url) async {
+        print(url.link.toString());
 
-      print(url.link.queryParameters);
-      Navigator.of(context).pushNamed('/success');
-    }, onError: (yay) async {
-      print('failure');
-      print(yay.message);
-    });
+        print(url.link.queryParameters);
+        Navigator.of(context).pushNamed('/success');
+      },
+      onError: (yay) async {
+        print('failure');
+        print(yay.message);
+      },
+    );
     super.initState();
   }
 
@@ -118,3 +125,5 @@ class _HomeState extends State<Home> {
     );
   }
 }
+
+///********************************************************
