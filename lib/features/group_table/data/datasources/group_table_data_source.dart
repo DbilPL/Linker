@@ -116,18 +116,17 @@ class GroupTableDataSourceImpl extends GroupTableDataSource {
 
   @override
   Stream<Uri> dynamicLinkStream() {
+    StreamController c = StreamController<Uri>();
     try {
-      StreamController c = StreamController<Uri>();
-
       firebaseDynamicLinks.onLink(onSuccess: (url) async {
         c.add(url.link);
       }, onError: (error) async {
         c.addError(Exception());
-        c.close();
       });
 
       return c.stream;
     } catch (E) {
+      c.close();
       throw Exception();
     }
   }
