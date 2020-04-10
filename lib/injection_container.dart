@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:get_it/get_it.dart';
+import 'package:linker/core/presentation/bloc/bloc.dart';
 import 'package:linker/features/authentication/data/datasources/authentication_data_source.dart';
 import 'package:linker/features/authentication/data/respositories/authentication_repository_impl.dart';
 import 'package:linker/features/authentication/domain/usecases/register.dart';
@@ -10,6 +12,7 @@ import 'package:linker/features/authentication/domain/usecases/sign_in_auto.dart
 import 'package:linker/features/authentication/domain/usecases/sign_out.dart';
 import 'package:linker/features/group_table/data/datasources/group_table_data_source.dart';
 import 'package:linker/features/group_table/data/respositories/group_table_repository_impl.dart';
+import 'package:linker/features/group_table/domain/usecases/dynamic_link_stream.dart';
 import 'package:linker/features/group_table/domain/usecases/generate_joining_link.dart';
 import 'package:linker/features/group_table/domain/usecases/get_group_table_stream.dart';
 import 'package:linker/features/group_table/domain/usecases/update_group_table_data.dart';
@@ -26,6 +29,7 @@ Future<void> init() async {
   sl.registerSingleton(Firestore.instance);
   sl.registerSingleton(await SharedPreferences.getInstance());
   sl.registerSingleton(FirebaseAuth.instance);
+  sl.registerSingleton(FirebaseDynamicLinks.instance);
   sl.registerSingleton(DataConnectionChecker());
 
   // authentication
@@ -51,10 +55,13 @@ Future<void> init() async {
   sl.registerSingleton(UpdateUserData(sl<UserTableRepositoryImpl>()));
 
   // group table
-  sl.registerSingleton(GroupTableDataSourceImpl(sl<Firestore>()));
+  sl.registerSingleton(
+      GroupTableDataSourceImpl(sl<Firestore>(), sl<FirebaseDynamicLinks>()));
   sl.registerSingleton(GroupTableRepositoryImpl(
       sl<GroupTableDataSourceImpl>(), sl<DataConnectionChecker>()));
   sl.registerSingleton(GetGroupTableStream(sl<GroupTableRepositoryImpl>()));
   sl.registerSingleton(UpdateGroupTableData(sl<GroupTableRepositoryImpl>()));
   sl.registerSingleton(GenerateJoiningLink(sl<GroupTableRepositoryImpl>()));
+  sl.registerSingleton(DynamicLinkStream(sl<GroupTableRepositoryImpl>()));
+  sl.registerSingleton(DynamicLinkBloc(sl<DynamicLinkStream>()));
 }

@@ -74,4 +74,18 @@ class GroupTableRepositoryImpl extends GroupTableRepository {
       return Left(FirebaseFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, Stream<Uri>>> dynamicLinkStream() async {
+    try {
+      if (await connectionChecker.hasConnection) {
+        final stream = dataSource.dynamicLinkStream();
+
+        return Right(stream);
+      } else
+        return Left(ConnectionFailure());
+    } catch (e) {
+      return Left(FirebaseFailure());
+    }
+  }
 }

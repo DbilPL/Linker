@@ -17,4 +17,6 @@ abstract class GroupTableRepository {
     String uid,
     String userName,
   });
+
+  Future<Either<Failure, Stream<Uri>>> dynamicLinkStream();
 }

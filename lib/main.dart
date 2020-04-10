@@ -1,10 +1,9 @@
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:share/share.dart';
+import 'package:linker/injection_container.dart';
 
 import 'core/bloc_delegate.dart';
+import 'core/presentation/bloc/bloc.dart';
 import 'injection_container.dart' as di;
 
 void main() async {
@@ -13,41 +12,21 @@ void main() async {
   // inits all instances from one point
   await di.init();
 
-  ///********************************************************
-  /// TEST
-  final FirebaseDynamicLinks firebaseDynamicLinks =
-      FirebaseDynamicLinks.instance;
-
-  final DynamicLinkParameters parameters = DynamicLinkParameters(
-    uriPrefix: 'https://linkerapp.page.link',
-    link: Uri.parse('https://linkerapp.page.link/groups?group=test_group'),
-    androidParameters: AndroidParameters(
-      packageName: 'com.example.linker',
-      minimumVersion: 0,
+  BlocSupervisor.delegate = SimpleBlocDelegate();
+  runApp(
+    MultiBlocProvider(
+      child: MyApp(),
+      providers: [
+        BlocProvider<DynamicLinkBloc>(
+          create: (context) =>
+              sl<DynamicLinkBloc>()..add(LoadOnLinkHandler()), // Link Bloc
+        ),
+      ],
     ),
   );
-
-  final Uri dynamicUrl = await parameters.buildUrl();
-  final ShortDynamicLink shortenedLink = await DynamicLinkParameters.shortenUrl(
-    dynamicUrl,
-    DynamicLinkParametersOptions(
-        shortDynamicLinkPathLength: ShortDynamicLinkPathLength.unguessable),
-  );
-  final Uri shortUrl = shortenedLink.shortUrl;
-
-  BlocSupervisor.delegate = SimpleBlocDelegate();
-  runApp(MyApp(
-    url: Uri.parse("https://linkerapp.page.link" + shortUrl.path),
-    firebaseDynamicLinks: firebaseDynamicLinks,
-  ));
 }
 
 class MyApp extends StatefulWidget {
-  final Uri url;
-  final FirebaseDynamicLinks firebaseDynamicLinks;
-
-  const MyApp({Key key, this.url, this.firebaseDynamicLinks}) : super(key: key);
-
   @override
   _MyAppState createState() => _MyAppState();
 }
@@ -56,74 +35,39 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Linker',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      routes: {
-        '/success': (context) => Scaffold(
-              body: Center(
-                child: Text('yay'),
-              ),
-            ),
-      },
-      home: Home(
-        url: widget.url,
-        firebaseDynamicLinks: widget.firebaseDynamicLinks,
+      routes: {},
+      home: BlocBuilder<DynamicLinkBloc, DynamicLinkState>(
+        builder: (context, state) {
+          if (state is InitialDynamicLinkState) {
+            // introduction animation
+            return Scaffold();
+          }
+          if (state is LoadLinkHandlerSuccess) {
+            return StreamBuilder<Uri>(
+              stream: state.stream,
+              builder: (BuildContext context, AsyncSnapshot<Uri> snapshot) {
+                if (snapshot.hasData) {
+                  // add user to group and open group page
+                  // snapshot.data.queryParameters['group_name'];
+                } else {
+                  // do nothing
+                }
+                return Scaffold();
+              },
+              initialData: null,
+            );
+          }
+          if (state is FailureLinkState) {
+            // on error try again (BlocProvider.of(context).add(LoadOnLinkHandler())))
+            return Scaffold();
+          } else
+            return Scaffold();
+        },
       ),
     );
   }
 }
-
-class Home extends StatefulWidget {
-  final FirebaseDynamicLinks firebaseDynamicLinks;
-  final Uri url;
-
-  const Home({Key key, this.url, this.firebaseDynamicLinks}) : super(key: key);
-
-  @override
-  _HomeState createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  @override
-  void initState() {
-    widget.firebaseDynamicLinks.onLink(
-      onSuccess: (url) async {
-        print(url.link.toString());
-
-        print(url.link.queryParameters);
-        Navigator.of(context).pushNamed('/success');
-      },
-      onError: (yay) async {
-        print('failure');
-        print(yay.message);
-      },
-    );
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: widget.url.toString(),
-                style: TextStyle(color: Colors.blue),
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () {
-                    Share.share(widget.url.toString());
-                  },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-///********************************************************

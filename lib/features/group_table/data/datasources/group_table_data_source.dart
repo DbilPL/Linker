@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:linker/features/group_table/data/model/group_link_table_model.dart';
 
 abstract class GroupTableDataSource {
@@ -19,17 +22,48 @@ abstract class GroupTableDataSource {
   /// Throws [Exception], when something went wrong
   Future<Stream<DocumentSnapshot>> createNewGroup(
       {String uid, String userName, String groupName});
+
+  /// Creates new group in [Firestore] via group name and creator uid
+  /// Throws [Exception], when something went wrong
+  Stream<Uri> dynamicLinkStream();
 }
 
 class GroupTableDataSourceImpl extends GroupTableDataSource {
   final Firestore firestore;
+  final FirebaseDynamicLinks firebaseDynamicLinks;
 
-  GroupTableDataSourceImpl(this.firestore);
+  GroupTableDataSourceImpl(this.firestore, this.firebaseDynamicLinks);
 
   @override
-  Future<String> generateJoiningLink({String tableName}) {
-    // TODO: implement generateJoiningLink
-    return null;
+  Future<String> generateJoiningLink({String tableName}) async {
+    try {
+      final DynamicLinkParameters parameters = DynamicLinkParameters(
+        uriPrefix: 'https://linkerapp.page.link',
+        link: Uri.parse(
+            'https://linkerapp.page.link/groups?group_name=$tableName}'),
+        androidParameters: AndroidParameters(
+          packageName: 'com.example.linker',
+          minimumVersion: 0,
+        ),
+        iosParameters: IosParameters(
+          bundleId: 'com.example.linker',
+        ),
+      );
+
+      final Uri dynamicUrl = await parameters.buildUrl();
+      final ShortDynamicLink shortenedLink =
+          await DynamicLinkParameters.shortenUrl(
+        dynamicUrl,
+        DynamicLinkParametersOptions(
+          shortDynamicLinkPathLength: ShortDynamicLinkPathLength.unguessable,
+        ),
+      );
+      final Uri shortUrl = shortenedLink.shortUrl;
+
+      return 'https://linkerapp.page.link' + shortUrl.path;
+    } catch (E) {
+      throw Exception();
+    }
   }
 
   @override
@@ -75,6 +109,24 @@ class GroupTableDataSourceImpl extends GroupTableDataSource {
       );
 
       return document.snapshots();
+    } catch (E) {
+      throw Exception();
+    }
+  }
+
+  @override
+  Stream<Uri> dynamicLinkStream() {
+    try {
+      StreamController c = StreamController<Uri>();
+
+      firebaseDynamicLinks.onLink(onSuccess: (url) async {
+        c.add(url.link);
+      }, onError: (error) async {
+        c.addError(Exception());
+        c.close();
+      });
+
+      return c.stream;
     } catch (E) {
       throw Exception();
     }
