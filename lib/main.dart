@@ -36,9 +36,6 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Linker',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
       routes: {},
       home: BlocBuilder<DynamicLinkBloc, DynamicLinkState>(
         builder: (context, state) {

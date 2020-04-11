@@ -39,7 +39,7 @@ dev_dependencies:
   cloud_firestore_mocks: ^0.4.2
 flutter:
   assets:
-    - assets/images/linkedd.png
+    - assets/images/app_icon.svg
 
 
   uses-material-design: true
