@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:linker/features/authentication/presentation/pages/auth_page.dart';
 import 'package:linker/injection_container.dart';
 
 import 'core/bloc_delegate.dart';
@@ -58,7 +57,7 @@ class _MyAppState extends State<MyApp> {
                 } else {
                   // do nothing
                 }
-                return AuthPage();
+                return Scaffold();
               },
               initialData: null,
             );

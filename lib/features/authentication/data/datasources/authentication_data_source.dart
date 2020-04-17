@@ -127,25 +127,4 @@ class AuthenticationDataSourceImpl extends AuthenticationDataSource {
       throw Exception();
     }
   }
-
-  ///
-
-//  @override
-//  Future<Stream<DocumentSnapshot>> getUserDataStream({String uid}) async {
-//    try {
-//      final Stream<DocumentSnapshot> documentSnapshot =
-//          firestore.collection('users').document(uid).snapshots();
-//
-////      documentSnapshot.listen((data) {
-////        data.reference.updateData({
-////          some data
-////        });
-////      });
-//
-//      return documentSnapshot;
-//    } catch (e) {
-//      print(e);
-//      throw Exception();
-//    }
-//  }
 }
