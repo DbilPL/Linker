@@ -44,6 +44,10 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Linker',
+      theme: ThemeData(
+          primaryColor: Colors.black,
+          errorColor: Colors.red,
+          backgroundColor: Colors.white),
       routes: {},
       home: BlocListener(
         listener: (context, state) {
