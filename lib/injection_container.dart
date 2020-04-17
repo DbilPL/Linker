@@ -16,6 +16,7 @@ import 'package:linker/features/group_table/domain/usecases/dynamic_link_stream.
 import 'package:linker/features/group_table/domain/usecases/generate_joining_link.dart';
 import 'package:linker/features/group_table/domain/usecases/get_group_table_stream.dart';
 import 'package:linker/features/group_table/domain/usecases/update_group_table_data.dart';
+import 'package:linker/features/group_table/presentation/bloc/group_table_bloc.dart';
 import 'package:linker/features/table/data/datasources/user_table_data_source.dart';
 import 'package:linker/features/table/data/respositories/user_table_repository_impl.dart';
 import 'package:linker/features/table/domain/usecases/get_user_data_stream.dart';
@@ -64,4 +65,5 @@ Future<void> init() async {
   sl.registerSingleton(GenerateJoiningLink(sl<GroupTableRepositoryImpl>()));
   sl.registerSingleton(DynamicLinkStream(sl<GroupTableRepositoryImpl>()));
   sl.registerSingleton(DynamicLinkBloc(sl<DynamicLinkStream>()));
+  sl.registerSingleton(GroupTableBloc());
 }
