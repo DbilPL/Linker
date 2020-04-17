@@ -8,3 +8,12 @@ class InitialAuthenticationState extends AuthenticationState {
   @override
   List<Object> get props => [];
 }
+
+class Entered extends AuthenticationState {
+  final String uid;
+
+  Entered(this.uid);
+
+  @override
+  List<Object> get props => [];
+}
