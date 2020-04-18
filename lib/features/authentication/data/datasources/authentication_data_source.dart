@@ -95,23 +95,28 @@ class AuthenticationDataSourceImpl extends AuthenticationDataSource {
   @override
   Future<User> signInAuto() async {
     try {
-      final UserModel user = UserModel.fromJson(
-        json: jsonDecode(
-          sharedPreferences.getString(_authenticationKey),
-        ),
-      );
+      final jsonEncoded = sharedPreferences.getString(_authenticationKey);
 
-      final AuthResult authResult =
-          await firebaseAuth.signInWithEmailAndPassword(
-              email: user.email, password: user.password);
+      if (jsonEncoded != null) {
+        final UserModel user = UserModel.fromJson(
+          json: jsonDecode(
+            jsonEncoded,
+          ),
+        );
 
-      final FirebaseUser fUser = authResult.user;
+        final AuthResult authResult =
+            await firebaseAuth.signInWithEmailAndPassword(
+                email: user.email, password: user.password);
 
-      return UserModel(
-        email: user.email,
-        password: user.password,
-        uid: fUser.uid,
-      );
+        final FirebaseUser fUser = authResult.user;
+
+        return UserModel(
+          email: user.email,
+          password: user.password,
+          uid: fUser.uid,
+        );
+      } else
+        throw Exception();
     } catch (e) {
       print(e);
       throw Exception();

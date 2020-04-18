@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:linker/features/authentication/data/model/user_model.dart';
 
 abstract class AuthenticationState extends Equatable {
   const AuthenticationState();
@@ -9,11 +10,16 @@ class InitialAuthenticationState extends AuthenticationState {
   List<Object> get props => [];
 }
 
-class Entered extends AuthenticationState {
-  final String uid;
-
-  Entered(this.uid);
-
+class FailureAuthenticationState extends AuthenticationState {
   @override
   List<Object> get props => [];
+}
+
+class Entered extends AuthenticationState {
+  final UserModel userModel;
+
+  Entered(this.userModel);
+
+  @override
+  List<Object> get props => [userModel];
 }

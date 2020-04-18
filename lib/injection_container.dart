@@ -10,6 +10,7 @@ import 'package:linker/features/authentication/domain/usecases/register.dart';
 import 'package:linker/features/authentication/domain/usecases/sign_in.dart';
 import 'package:linker/features/authentication/domain/usecases/sign_in_auto.dart';
 import 'package:linker/features/authentication/domain/usecases/sign_out.dart';
+import 'package:linker/features/authentication/presentation/bloc/bloc.dart';
 import 'package:linker/features/group_table/data/datasources/group_table_data_source.dart';
 import 'package:linker/features/group_table/data/respositories/group_table_repository_impl.dart';
 import 'package:linker/features/group_table/domain/usecases/dynamic_link_stream.dart';
@@ -47,6 +48,7 @@ Future<void> init() async {
   sl.registerSingleton(SignIn(sl<AuthenticationRepositoryImpl>()));
   sl.registerSingleton(SignInAuto(sl<AuthenticationRepositoryImpl>()));
   sl.registerSingleton(SignOut(sl<AuthenticationRepositoryImpl>()));
+  sl.registerSingleton(AuthenticationBloc(sl<Register>(), sl<SignInAuto>()));
 
   // user table
   sl.registerSingleton(UserTableDataSourceImpl(sl<Firestore>()));
@@ -65,5 +67,5 @@ Future<void> init() async {
   sl.registerSingleton(GenerateJoiningLink(sl<GroupTableRepositoryImpl>()));
   sl.registerSingleton(DynamicLinkStream(sl<GroupTableRepositoryImpl>()));
   sl.registerSingleton(DynamicLinkBloc(sl<DynamicLinkStream>()));
-  sl.registerSingleton(GroupTableBloc());
+  sl.registerSingleton(GroupTableBloc(sl<GetGroupTableStream>()));
 }

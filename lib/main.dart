@@ -8,7 +8,9 @@ import 'package:linker/injection_container.dart';
 import 'core/bloc_delegate.dart';
 import 'core/presentation/bloc/bloc.dart';
 import 'features/authentication/presentation/bloc/authentication_bloc.dart';
+import 'features/authentication/presentation/bloc/authentication_event.dart';
 import 'features/authentication/presentation/bloc/authentication_state.dart';
+import 'features/authentication/presentation/pages/auth_page.dart';
 import 'injection_container.dart' as di;
 
 void main() async {
@@ -22,6 +24,9 @@ void main() async {
     MultiBlocProvider(
       child: MyApp(),
       providers: [
+        BlocProvider<AuthenticationBloc>(
+          create: (context) => sl<AuthenticationBloc>()..add(AutoRegister()),
+        ),
         BlocProvider<DynamicLinkBloc>(
           create: (context) =>
               sl<DynamicLinkBloc>()..add(LoadOnLinkHandler()), // Link Bloc
@@ -45,11 +50,12 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Linker',
       theme: ThemeData(
-          primaryColor: Colors.black,
-          errorColor: Colors.red,
-          backgroundColor: Colors.white),
+        primaryColor: Colors.black,
+        errorColor: Colors.red,
+        backgroundColor: Colors.white,
+      ),
       routes: {},
-      home: BlocListener(
+      home: BlocListener<GroupTableBloc, GroupTableState>(
         listener: (context, state) {
           if (state is SnapshotsLoaded) {
             // route to page with group table
@@ -63,7 +69,7 @@ class _MyAppState extends State<MyApp> {
                 ..groupNameList.add(state.groupName);
 
               BlocProvider.of<UserTableBloc>(context)
-                  .add(UpdateUserData(authState.uid, userDataModel));
+                  .add(UpdateUserData(authState.userModel.uid, userDataModel));
             }
           }
         },
@@ -71,7 +77,11 @@ class _MyAppState extends State<MyApp> {
           builder: (context, state) {
             if (state is InitialDynamicLinkState) {
               // introduction animation
-              return Scaffold();
+              return Scaffold(
+                body: Center(
+                  child: Text('Animation'),
+                ),
+              );
             }
             if (state is LoadLinkHandlerSuccess) {
               return StreamBuilder<Uri>(
@@ -83,10 +93,8 @@ class _MyAppState extends State<MyApp> {
                         snapshot.data.queryParameters['group_name'],
                       ),
                     );
-                  } else {
-                    // do nothing
                   }
-                  return Scaffold();
+                  return AuthPage();
                 },
                 initialData: null,
               );
