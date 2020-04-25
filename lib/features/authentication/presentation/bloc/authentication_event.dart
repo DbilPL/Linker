@@ -14,4 +14,13 @@ class RegisterEvent extends AuthenticationEvent {
   List<Object> get props => [password, email, name];
 }
 
-class AutoRegister extends AuthenticationEvent {}
+class SignInEvent extends AuthenticationEvent {
+  final String password;
+  final String email;
+
+  SignInEvent(this.email, this.password);
+
+  List<Object> get props => [password, email];
+}
+
+class AutoSignIn extends AuthenticationEvent {}

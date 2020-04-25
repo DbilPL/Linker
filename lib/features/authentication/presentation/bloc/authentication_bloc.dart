@@ -22,12 +22,34 @@ class AuthenticationBloc
   Stream<AuthenticationState> mapEventToState(
     AuthenticationEvent event,
   ) async* {
-    if (event is RegisterEvent) {}
-    if (event is AutoRegister) {
+    yield LoadingAuthenticationState();
+
+    final RegExp emailRegExp = RegExp(
+        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+
+    final RegExp spaces = RegExp(r"\s+\b|\b\s");
+
+    if (event is SignInEvent) {
+      final email = event.email.replaceAll(spaces, '');
+      final password = event.password.replaceAll(spaces, '');
+
+      if (emailRegExp.hasMatch(email)) {
+        if (password.length > 6) {
+        } else
+          yield FailureAuthenticationState('Email isn\'t valid!');
+      } else
+        yield FailureAuthenticationState('Email isn\'t valid!');
+    }
+    if (event is RegisterEvent) {
+      final name = event.name.replaceAll(spaces, '');
+      final email = event.email.replaceAll(spaces, '');
+      final password = event.password.replaceAll(spaces, '');
+    }
+    if (event is AutoSignIn) {
       final result = await signInAuto(NoParams());
 
       yield result.fold((failure) {
-        return FailureAuthenticationState();
+        return FailureAuthenticationState(failure.error);
       }, (user) {
         return Entered(user);
       });

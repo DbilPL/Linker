@@ -10,7 +10,8 @@ import 'core/presentation/bloc/bloc.dart';
 import 'features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'features/authentication/presentation/bloc/authentication_event.dart';
 import 'features/authentication/presentation/bloc/authentication_state.dart';
-import 'features/authentication/presentation/pages/auth_page.dart';
+import 'features/authentication/presentation/pages/sign_in_page.dart';
+import 'features/authentication/presentation/pages/sign_up_page.dart';
 import 'injection_container.dart' as di;
 
 void main() async {
@@ -25,7 +26,7 @@ void main() async {
       child: MyApp(),
       providers: [
         BlocProvider<AuthenticationBloc>(
-          create: (context) => sl<AuthenticationBloc>()..add(AutoRegister()),
+          create: (context) => sl<AuthenticationBloc>()..add(AutoSignIn()),
         ),
         BlocProvider<DynamicLinkBloc>(
           create: (context) =>
@@ -50,11 +51,25 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Linker',
       theme: ThemeData(
-        primaryColor: Colors.black,
         errorColor: Colors.red,
         backgroundColor: Colors.white,
+        accentColor: Colors.black54,
+        buttonTheme: ButtonThemeData(
+          buttonColor: Color.fromRGBO(20, 37, 186, 1),
+        ),
+        textTheme: TextTheme(
+          button: TextStyle(
+            color: Colors.white,
+          ),
+          title: TextStyle(
+            fontSize: 50,
+            color: Color.fromRGBO(20, 37, 186, 1),
+          ),
+        ),
       ),
-      routes: {},
+      routes: {
+        '/sign-up': (context) => SignUpPage(),
+      },
       home: BlocListener<GroupTableBloc, GroupTableState>(
         listener: (context, state) {
           if (state is SnapshotsLoaded) {
@@ -94,7 +109,7 @@ class _MyAppState extends State<MyApp> {
                       ),
                     );
                   }
-                  return AuthPage();
+                  return SignInPage();
                 },
                 initialData: null,
               );

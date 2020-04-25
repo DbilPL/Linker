@@ -10,7 +10,16 @@ class InitialAuthenticationState extends AuthenticationState {
   List<Object> get props => [];
 }
 
+class LoadingAuthenticationState extends AuthenticationState {
+  @override
+  List<Object> get props => [];
+}
+
 class FailureAuthenticationState extends AuthenticationState {
+  final String message;
+
+  FailureAuthenticationState(this.message);
+
   @override
   List<Object> get props => [];
 }
