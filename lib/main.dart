@@ -12,6 +12,7 @@ import 'features/authentication/presentation/bloc/authentication_event.dart';
 import 'features/authentication/presentation/bloc/authentication_state.dart';
 import 'features/authentication/presentation/pages/sign_in_page.dart';
 import 'features/authentication/presentation/pages/sign_up_page.dart';
+import 'features/table/presentation/pages/user_page.dart';
 import 'injection_container.dart' as di;
 
 void main() async {
@@ -51,6 +52,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Linker',
       theme: ThemeData(
+        cardColor: Color(0xff9CA9ED),
         errorColor: Colors.red,
         backgroundColor: Colors.white,
         accentColor: Colors.black54,
@@ -67,8 +69,11 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
       ),
+      initialRoute: '/sign-in',
       routes: {
         '/sign-up': (context) => SignUpPage(),
+        '/sign-in': (context) => SignInPage(),
+        '/user': (context) => UserPage(),
       },
       home: BlocListener<GroupTableBloc, GroupTableState>(
         listener: (context, state) {

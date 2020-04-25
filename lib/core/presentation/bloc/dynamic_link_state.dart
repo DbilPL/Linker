@@ -5,7 +5,8 @@ abstract class DynamicLinkState extends Equatable {
   const DynamicLinkState();
 }
 
-class InitialDynamicLinkState extends DynamicLinkState {
+class
+InitialDynamicLinkState extends DynamicLinkState {
   @override
   List<Object> get props => [];
 }
