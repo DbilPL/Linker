@@ -19,29 +19,28 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthenticationBloc, AuthenticationState>(
-      listener: (BuildContext context, AuthenticationState state) {
-        if (state is FailureAuthenticationState) {
-          Scaffold.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                state.message,
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color.fromRGBO(186, 228, 229, 1),
+      ),
+      body: BlocListener<AuthenticationBloc, AuthenticationState>(
+        listener: (context, state) {
+          if (state is FailureAuthenticationState) {
+            Scaffold.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: Theme.of(context).errorColor,
+                content: Text(
+                  state.message,
+                ),
               ),
-              backgroundColor: Theme.of(context).errorColor,
-            ),
-          );
-        }
-        if (state is Entered) {
-          // to user page
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Color.fromRGBO(186, 228, 229, 1),
-        ),
-        body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+            );
+          }
+          if (state is Entered) {}
+        },
+        child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
           builder: (context, state) {
-            if (state is InitialAuthenticationState) {
+            if (state is InitialAuthenticationState ||
+                state is LoadingAuthenticationState) {
               return Center(
                 child: CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(

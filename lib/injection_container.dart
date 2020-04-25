@@ -48,7 +48,8 @@ Future<void> init() async {
   sl.registerSingleton(SignIn(sl<AuthenticationRepositoryImpl>()));
   sl.registerSingleton(SignInAuto(sl<AuthenticationRepositoryImpl>()));
   sl.registerSingleton(SignOut(sl<AuthenticationRepositoryImpl>()));
-  sl.registerSingleton(AuthenticationBloc(sl<Register>(), sl<SignInAuto>()));
+  sl.registerSingleton(
+      AuthenticationBloc(sl<Register>(), sl<SignInAuto>(), sl<SignIn>()));
 
   // user table
   sl.registerSingleton(UserTableDataSourceImpl(sl<Firestore>()));
