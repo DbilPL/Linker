@@ -79,11 +79,13 @@ class _SignUpPageState extends State<SignUpPage> {
                                   labelText: 'E-mail',
                                 ),
                                 controller: _emailController,
+                                keyboardType: TextInputType.emailAddress,
                               ),
                               TextFormField(
                                 decoration: InputDecoration(
                                   labelText: 'Password',
                                 ),
+                                keyboardType: TextInputType.visiblePassword,
                                 controller: _passwordController,
                               ),
                             ],

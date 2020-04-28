@@ -22,6 +22,7 @@ import 'package:linker/features/table/data/datasources/user_table_data_source.da
 import 'package:linker/features/table/data/respositories/user_table_repository_impl.dart';
 import 'package:linker/features/table/domain/usecases/get_user_data_stream.dart';
 import 'package:linker/features/table/domain/usecases/update_user_data.dart';
+import 'package:linker/features/table/presentation/bloc/user_table_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final sl = GetIt.instance;
@@ -57,6 +58,7 @@ Future<void> init() async {
       sl<UserTableDataSourceImpl>(), sl<DataConnectionChecker>()));
   sl.registerSingleton(GetUserDataStream(sl<UserTableRepositoryImpl>()));
   sl.registerSingleton(UpdateUserData(sl<UserTableRepositoryImpl>()));
+  sl.registerSingleton(UserTableBloc(sl<GetUserDataStream>()));
 
   // group table
   sl.registerSingleton(

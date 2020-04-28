@@ -1,7 +1,10 @@
-import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:linker/core/presentation/bloc/bloc.dart';
+import 'package:linker/features/authentication/presentation/bloc/authentication_bloc.dart';
+import 'package:linker/features/authentication/presentation/bloc/bloc.dart';
+import 'package:linker/features/table/data/model/user_data_model.dart';
 import 'package:linker/features/table/presentation/bloc/bloc.dart';
 
 class UserPage extends StatefulWidget {
@@ -11,36 +14,92 @@ class UserPage extends StatefulWidget {
 
 class _UserPageState extends State<UserPage> {
   @override
+  void initState() {
+    final authState = BlocProvider.of<AuthenticationBloc>(context).state;
+    if (authState is Entered) {
+      BlocProvider.of<UserTableBloc>(context)
+          .add(LoadUserDataInitial(authState.userModel.uid));
+    }
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocListener<DynamicLinkBloc, DynamicLinkState>(
-      listener: (BuildContext context, DynamicLinkState state){
-
+      listener: (BuildContext context, DynamicLinkState state) {
+        if (state is FailureAuthenticationState) {}
       },
-      child: Scaffold(
-        appBar:AppBar(backgroundColor: Theme.of(context).cardColor,actions: <Widget>[],) ,
+      child: BlocBuilder<UserTableBloc, UserTableState>(
+        builder: (context, state) {
+          final authState = BlocProvider.of<AuthenticationBloc>(context).state;
 
-        body: BlocBuilder<DynamicLinkBloc, DynamicLinkState>(
-          builder: (context, state){
-            if(state is InitialDynamicLinkState){
-              return Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  Color.fromRGBO(186, 228, 229, 1),
+          if (authState is Entered) {
+            if (state.stream == null)
+              return Scaffold(
+                appBar: AppBar(),
+                body: Container(),
+              );
+            else
+              return Scaffold(
+                appBar: AppBar(
+                  title: Text(
+                    'Main page',
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                  actions: <Widget>[
+                    state is InitialUserTableState ||
+                            state is LoadingUserTableState
+                        ? CircularProgressIndicator()
+                        : SizedBox(),
+                  ],
+                ),
+                drawer: Drawer(),
+                bottomNavigationBar: BottomAppBar(
+                  color: Theme.of(context).primaryColor,
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.add_circle_outline,
+                      size: 37,
+                      color: Theme.of(context).backgroundColor,
+                    ),
+                    onPressed: () {},
+                  ),
+                ),
+                body: StreamBuilder(
+                  builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                    if (snapshot.hasData) {
+                      final userTableData =
+                          UserDataModel.fromJson(snapshot.data.data);
+
+                      return userTableData.table != null
+                          ? ListView()
+                          : Center(
+                              child: Text('No data!'),
+                            );
+                    } else
+                      return Container();
+                  },
+                  initialData: null,
+                  stream: state.stream,
+                ),
+              );
+          } else
+            return Scaffold(
+              body: Center(
+                child: Column(
+                  children: <Widget>[
+                    Text('How did you get there?!'),
+                    RaisedButton(
+                      child: Text('Back'),
+                      onPressed: () {
+                        Navigator.of(context).pushNamed('/sign-in');
+                      },
+                    ),
+                  ],
                 ),
               ),
-            );}
-            if (state is LoadLinkHandlerSuccess){
-              return Center(
-                child: Container(width: 200,
-                height: 200,
-                color: Colors.red,),
-              );
-            }
-           return Center(child: Container(width: 200.0,
-           height: 200.0,
-           color: Colors.pink,),);
-          },
-        ),
+            );
+        },
       ),
     );
   }

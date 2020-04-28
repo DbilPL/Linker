@@ -1,15 +1,14 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:linker/features/authentication/data/model/user_model.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:linker/features/table/domain/usecases/get_user_data_stream.dart';
 
 import './bloc.dart';
 
 class UserTableBloc extends Bloc<UserTableEvent, UserTableState> {
-  final BehaviorSubject<UserModel> userData;
+  final GetUserDataStream _getUserDataStream;
 
-  UserTableBloc(this.userData);
+  UserTableBloc(this._getUserDataStream);
 
   @override
   UserTableState get initialState => InitialUserTableState();
@@ -18,6 +17,16 @@ class UserTableBloc extends Bloc<UserTableEvent, UserTableState> {
   Stream<UserTableState> mapEventToState(
     UserTableEvent event,
   ) async* {
-    // TODO: Add Logic
+    if (event is LoadUserDataInitial) {
+      yield LoadingUserTableState(null);
+
+      final result = await _getUserDataStream(event.uid);
+
+      yield result.fold((failure) {
+        return FailureUserTableState(failure.error, null);
+      }, (success) {
+        return UserDataLoaded(success);
+      });
+    }
   }
 }

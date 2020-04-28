@@ -62,12 +62,14 @@ class _SignInPageState extends State<SignInPage> {
                                   labelText: 'E-mail',
                                 ),
                                 controller: _emailController,
+                                keyboardType: TextInputType.emailAddress,
                               ),
                               TextFormField(
                                 decoration: InputDecoration(
                                   labelText: 'Password',
                                 ),
                                 controller: _passwordController,
+                                keyboardType: TextInputType.visiblePassword,
                               ),
                             ],
                           ),
