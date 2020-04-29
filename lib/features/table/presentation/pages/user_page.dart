@@ -4,8 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:linker/core/presentation/bloc/bloc.dart';
 import 'package:linker/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:linker/features/authentication/presentation/bloc/bloc.dart';
+import 'package:linker/features/table/data/model/link_model.dart';
+import 'package:linker/features/table/data/model/link_type_model.dart';
 import 'package:linker/features/table/data/model/user_data_model.dart';
 import 'package:linker/features/table/presentation/bloc/bloc.dart';
+import 'package:linker/features/table/presentation/widgets/link_group_view.dart';
 
 class UserPage extends StatefulWidget {
   @override
@@ -47,6 +50,10 @@ class _UserPageState extends State<UserPage> {
                     style: Theme.of(context).textTheme.title,
                   ),
                   actions: <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.edit),
+                      onPressed: () {},
+                    ),
                     state is InitialUserTableState ||
                             state is LoadingUserTableState
                         ? CircularProgressIndicator()
@@ -62,20 +69,51 @@ class _UserPageState extends State<UserPage> {
                       size: 37,
                       color: Theme.of(context).backgroundColor,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/add-link-group');
+                    },
                   ),
                 ),
                 body: StreamBuilder(
                   builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
                     if (snapshot.hasData) {
-                      final userTableData =
+                      final userTableDataFromFirebase =
                           UserDataModel.fromJson(snapshot.data.data);
 
-                      return userTableData.table != null
-                          ? ListView()
-                          : Center(
-                              child: Text('No data!'),
+                      if (userTableDataFromFirebase.table != null) {
+                        final List<LinkTypeModel> types =
+                            userTableDataFromFirebase.types;
+
+                        final List<LinkModel> links =
+                            userTableDataFromFirebase.links;
+
+                        List<List<LinkModel>> sortedLinks = [];
+
+                        for (int i = 0; i < types.length; i++) {
+                          sortedLinks.add([]);
+                        }
+
+                        for (int i = 0; i < links.length; i++) {
+                          for (int j = 0; j < types.length; j++) {
+                            if (links[i].type == types[j].name) {
+                              sortedLinks[j].add(links[i]);
+                            }
+                          }
+                        }
+
+                        return ListView.builder(
+                          itemCount: types.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return LinkGroupView(
+                              links: sortedLinks[index],
+                              type: types[index],
                             );
+                          },
+                        );
+                      } else
+                        return Center(
+                          child: Text('No data!'),
+                        );
                     } else
                       return Container();
                   },

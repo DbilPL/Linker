@@ -4,6 +4,7 @@ import 'package:linker/core/presentation/pages/loading_page.dart';
 import 'package:linker/features/group_table/presentation/bloc/bloc.dart';
 import 'package:linker/features/table/data/model/user_data_model.dart';
 import 'package:linker/features/table/presentation/bloc/bloc.dart';
+import 'package:linker/features/table/presentation/pages/add_link_group_page.dart';
 import 'package:linker/injection_container.dart';
 
 import 'core/bloc_delegate.dart';
@@ -73,12 +74,16 @@ class _MyAppState extends State<MyApp> {
           title: TextStyle(
             color: Colors.white,
           ),
+          button: TextStyle(
+            color: Colors.white,
+          ),
         ),
       ),
       routes: {
         '/sign-up': (context) => SignUpPage(),
         '/sign-in': (context) => SignInPage(),
         '/user': (context) => UserPage(),
+        '/add-link-group': (context) => AddLinkGroupPage(),
       },
       home: BlocListener<AuthenticationBloc, AuthenticationState>(
         listener: (context, state) async {
@@ -100,12 +105,19 @@ class _MyAppState extends State<MyApp> {
                   BlocProvider.of<UserTableBloc>(context).state;
 
               if (authState is Entered && userTableState is UserDataLoaded) {
-                UserDataModel userDataModel = UserDataModel.fromJson(
-                    (await userTableState.stream.last).data)
-                  ..groupNameList.add(state.groupName);
+                final lastState = await userTableState.stream.last;
+
+                UserDataModel userDataModel =
+                    UserDataModel.fromJson(lastState.data)
+                      ..groupNameList.add(state.groupName);
 
                 BlocProvider.of<UserTableBloc>(context).add(
-                    UpdateUserData(authState.userModel.uid, userDataModel));
+                  UpdateUserDataEvent(
+                    userDataModel,
+                    lastState.reference,
+                    state.stream,
+                  ),
+                );
               }
             }
           },

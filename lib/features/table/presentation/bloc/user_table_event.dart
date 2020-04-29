@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:linker/features/table/data/model/user_data_model.dart';
 
@@ -14,12 +15,13 @@ class LoadUserDataInitial extends UserTableEvent {
   List<Object> get props => [uid];
 }
 
-class UpdateUserData extends UserTableEvent {
-  final String uid;
+class UpdateUserDataEvent extends UserTableEvent {
   final UserDataModel userDataModel;
+  final DocumentReference reference;
+  final Stream<DocumentSnapshot> prevStream;
 
-  UpdateUserData(this.uid, this.userDataModel);
+  UpdateUserDataEvent(this.userDataModel, this.reference, this.prevStream);
 
   @override
-  List<Object> get props => [uid, userDataModel];
+  List<Object> get props => [userDataModel, reference, prevStream];
 }

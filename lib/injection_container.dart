@@ -58,7 +58,8 @@ Future<void> init() async {
       sl<UserTableDataSourceImpl>(), sl<DataConnectionChecker>()));
   sl.registerSingleton(GetUserDataStream(sl<UserTableRepositoryImpl>()));
   sl.registerSingleton(UpdateUserData(sl<UserTableRepositoryImpl>()));
-  sl.registerSingleton(UserTableBloc(sl<GetUserDataStream>()));
+  sl.registerSingleton(
+      UserTableBloc(sl<GetUserDataStream>(), sl<UpdateUserData>()));
 
   // group table
   sl.registerSingleton(
