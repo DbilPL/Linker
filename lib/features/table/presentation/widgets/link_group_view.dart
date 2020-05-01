@@ -21,40 +21,43 @@ class _LinkGroupViewState extends State<LinkGroupView> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
-    return Container(
-      width: size.width,
-      color: widget.type.color,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            ListTile(
-              title: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.keyboard_arrow_down),
-                    onPressed: () {},
-                  ),
-                  Text(widget.type.name),
-                ],
-              ),
-              trailing: Text('Importance: ${widget.type.importance}'),
-            ),
-          ]..addAll(
-              isFullView
-                  ? Iterable.generate(
-                      3,
-                      (index) => LinkView(
-                        link: widget.links[index],
-                      ),
-                    )
-                  : Iterable.generate(
-                      widget.links.length,
-                      (index) => LinkView(
-                        link: widget.links[index],
-                      ),
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: Container(
+        width: size.width,
+        color: widget.type.color,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              ListTile(
+                title: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.keyboard_arrow_down),
+                      onPressed: () {},
                     ),
-            ),
+                    Text(widget.type.name),
+                  ],
+                ),
+                trailing: Text('Importance: ${widget.type.importance}'),
+              ),
+            ]..addAll(
+                isFullView
+                    ? Iterable.generate(
+                        3,
+                        (index) => LinkView(
+                          link: widget.links[index],
+                        ),
+                      )
+                    : Iterable.generate(
+                        widget.links.length,
+                        (index) => LinkView(
+                          link: widget.links[index],
+                        ),
+                      ),
+              ),
+          ),
         ),
       ),
     );
