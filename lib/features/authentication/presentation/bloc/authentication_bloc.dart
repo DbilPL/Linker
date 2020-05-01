@@ -36,25 +36,18 @@ class AuthenticationBloc
       final email = event.email.replaceAll(spaces, '');
       final password = event.password.replaceAll(spaces, '');
 
-      if (emailRegExp.hasMatch(email)) {
-        if (password.length > 6) {
-          final result = await signIn(
-            AuthenticationParams(
-              password: password,
-              email: email,
-            ),
-          );
+      final result = await signIn(
+        AuthenticationParams(
+          password: password,
+          email: email,
+        ),
+      );
 
-          yield result.fold((failure) {
-            return FailureAuthenticationState(failure.error);
-          }, (success) {
-            return Entered(success);
-          });
-        } else
-          yield FailureAuthenticationState(
-              'Password is too small! (more than 6 chars)');
-      } else
-        yield FailureAuthenticationState('Email isn\'t valid!');
+      yield result.fold((failure) {
+        return FailureAuthenticationState(failure.error);
+      }, (success) {
+        return Entered(success);
+      });
     }
     if (event is RegisterEvent) {
       final name = event.name.replaceAll(spaces, '');

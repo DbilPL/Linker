@@ -1,13 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_circle_color_picker/flutter_circle_color_picker.dart';
 import 'package:linker/features/table/data/model/link_type_model.dart';
 import 'package:linker/features/table/data/model/user_data_model.dart';
+import 'package:linker/features/table/data/model/user_link_table_model.dart';
+import 'package:linker/features/table/presentation/bloc/bloc.dart';
 import 'package:linker/features/table/presentation/bloc/user_table_bloc.dart';
 import 'package:linker/features/table/presentation/bloc/user_table_event.dart';
 
 class AddLinkGroupPage extends StatefulWidget {
-  AddLinkGroupPage({Key key}) : super(key: key);
+  final DocumentSnapshot snapshot;
+
+  AddLinkGroupPage({Key key, this.snapshot}) : super(key: key);
 
   @override
   _AddLinkGroupPageState createState() => _AddLinkGroupPageState();
@@ -54,15 +59,13 @@ class _AddLinkGroupPageState extends State<AddLinkGroupPage> {
               ],
             ),
             ListTile(
-              title: GestureDetector(
-                onTap: () {
-                  _openColorPicker();
-                },
-                child: Text(
-                  'Pick color',
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                  ),
+              onTap: () {
+                _openColorPicker();
+              },
+              title: Text(
+                'Pick color',
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
               trailing: Container(
@@ -77,27 +80,92 @@ class _AddLinkGroupPageState extends State<AddLinkGroupPage> {
             RaisedButton(
               onPressed: () async {
                 if (_groupNameController.text != '') {
-                  final prevStream =
-                      BlocProvider.of<UserTableBloc>(context).state.stream;
-                  final lastState = await prevStream.last;
+                  UserDataModel prevUserData =
+                      UserDataModel.fromJson(widget.snapshot.data);
 
-                  final newUserData = UserDataModel.fromJson(lastState.data)
-                    ..table.types.add(
-                          LinkTypeModel(
-                            importance: importanceValue,
-                            name: _groupNameController.text,
-                            color: selectedColor,
+                  if (prevUserData.table == null) {
+                    final prevUserData =
+                        UserDataModel.fromJson(widget.snapshot.data);
+                    final newUserData = UserDataModel(
+                      name: prevUserData.name,
+                      groupNameList: prevUserData.groupNameList,
+                      table: UserLinkTableModel(
+                        links: [],
+                        types: []..add(
+                            LinkTypeModel(
+                              importance: importanceValue,
+                              name: _groupNameController.text,
+                              color: selectedColor,
+                            ),
                           ),
-                        );
+                      ),
+                    );
+                    BlocProvider.of<UserTableBloc>(context).add(
+                      UpdateUserDataEvent(
+                        newUserData,
+                        widget.snapshot.reference,
+                      ),
+                    );
+                  } else {
+                    final prevUserData =
+                        UserDataModel.fromJson(widget.snapshot.data);
 
-                  BlocProvider.of<UserTableBloc>(context).add(
-                    UpdateUserDataEvent(
-                      newUserData,
-                      lastState.reference,
-                      prevStream,
-                    ),
-                  );
+                    List<LinkTypeModel> types =
+                        List.from(prevUserData.table.types);
 
+                    if (types.length != 0) {
+                      int number;
+
+                      for (int i = 0; i < types.length; i++) {
+                        final currentType = types[i];
+                        final nextType =
+                            i == types.length ? types[i] : types[i + 1];
+                        if (currentType.importance >= importanceValue &&
+                            nextType.importance <= importanceValue) {
+                          number = i + 1;
+                        } else if (currentType.importance <= importanceValue) {
+                          number = 0;
+                        }
+                        if (number != null) break;
+                      }
+
+                      print('2 $number');
+
+                      types.insert(
+                        number,
+                        LinkTypeModel(
+                          importance: importanceValue,
+                          name: _groupNameController.text,
+                          color: selectedColor,
+                        ),
+                      );
+                    } else {
+                      types.add(
+                        LinkTypeModel(
+                          importance: importanceValue,
+                          name: _groupNameController.text,
+                          color: selectedColor,
+                        ),
+                      );
+                      print('1');
+                    }
+
+                    final newUserDataModel = UserDataModel(
+                      groupNameList: prevUserData.groupNameList,
+                      name: prevUserData.name,
+                      table: UserLinkTableModel(
+                        links: prevUserData.table.links,
+                        types: types,
+                      ),
+                    );
+
+                    BlocProvider.of<UserTableBloc>(context).add(
+                      UpdateUserDataEvent(
+                        newUserDataModel,
+                        widget.snapshot.reference,
+                      ),
+                    );
+                  }
                   Navigator.pop(context);
                 }
               },
@@ -115,7 +183,7 @@ class _AddLinkGroupPageState extends State<AddLinkGroupPage> {
   void changeImportance(int i) {
     final newImportanceValue = importanceValue + i;
 
-    if (newImportanceValue >= 0) {
+    if (newImportanceValue >= 0 && newImportanceValue <= 12) {
       setState(() {
         importanceValue = newImportanceValue;
       });
@@ -145,7 +213,7 @@ class _AddLinkGroupPageState extends State<AddLinkGroupPage> {
 
   void _openColorPicker() async {
     _openDialog(
-      "Color picker",
+      'Color picker',
       CircleColorPicker(
         initialColor: Colors.red,
         onChanged: (color) {

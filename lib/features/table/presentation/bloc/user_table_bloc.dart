@@ -20,19 +20,15 @@ class UserTableBloc extends Bloc<UserTableEvent, UserTableState> {
     UserTableEvent event,
   ) async* {
     if (event is LoadUserDataInitial) {
-      yield LoadingUserTableState(null);
-
       final result = await _getUserDataStream(event.uid);
 
       yield result.fold((failure) {
-        return FailureUserTableState(failure.error, null);
+        return FailureUserTableState(failure.error);
       }, (success) {
         return UserDataLoaded(success);
       });
     }
     if (event is UpdateUserDataEvent) {
-      yield LoadingUserTableState(event.prevStream);
-
       final result = await _updateUserData(
         UpdateUserDataParams(
           newUserData: event.userDataModel,
@@ -40,13 +36,10 @@ class UserTableBloc extends Bloc<UserTableEvent, UserTableState> {
         ),
       );
 
-      Completer c = Completer<String>();
-
-      result.fold((failure) => c.complete(failure.error), (noMatter) => null);
-
-      final failure = await c.future;
-
-      yield FailureUserTableState(failure, event.prevStream);
+      yield result.fold(
+        (failure) => FailureUserTableState(failure.error),
+        (success) => UserDataLoaded(null),
+      );
     }
   }
 }

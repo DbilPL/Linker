@@ -19,14 +19,24 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthenticationBloc, AuthenticationState>(
-      listener: (BuildContext context, AuthenticationState state) {
-        if (state is Entered) {
-          // to user page
-        }
-      },
-      child: Scaffold(
-        body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+    return Scaffold(
+      body: BlocListener<AuthenticationBloc, AuthenticationState>(
+        listener: (BuildContext context, AuthenticationState state) {
+          if (state is FailureAuthenticationState) {
+            Scaffold.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: Theme.of(context).errorColor,
+                content: Text(
+                  state.message,
+                ),
+              ),
+            );
+          }
+          if (state is Entered) {
+            Navigator.pushReplacementNamed(context, '/user');
+          }
+        },
+        child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
           builder: (context, state) {
             if (state is InitialAuthenticationState ||
                 state is LoadingAuthenticationState) {
@@ -50,7 +60,7 @@ class _SignInPageState extends State<SignInPage> {
                       children: <Widget>[
                         Text(
                           'Sign in',
-                          style: Theme.of(context).textTheme.title,
+                          style: Theme.of(context).textTheme.headline3,
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -91,7 +101,7 @@ class _SignInPageState extends State<SignInPage> {
                                     style: TextStyle(
                                       color: Theme.of(context)
                                           .textTheme
-                                          .title
+                                          .caption
                                           .color,
                                       fontSize: 16,
                                     ),

@@ -1,6 +1,5 @@
 import 'package:dartz/dartz.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
-import 'package:linker/core/errors/exceptions.dart';
 import 'package:linker/core/errors/failure.dart';
 import 'package:linker/features/authentication/data/datasources/authentication_data_source.dart';
 import 'package:linker/features/authentication/domain/entities/user.dart';
@@ -22,10 +21,18 @@ class AuthenticationRepositoryImpl extends AuthenticationRepository {
             email: email, name: name, password: password);
         return Right(user);
       } catch (e) {
-        return Left(FirebaseFailure());
+        return Left(
+          Failure(
+            error: 'Somehting went wrong!',
+          ),
+        );
       }
     } else
-      return Left(ConnectionFailure());
+      return Left(
+        Failure(
+          error: 'Check your connection to internet!',
+        ),
+      );
   }
 
   @override
@@ -35,10 +42,18 @@ class AuthenticationRepositoryImpl extends AuthenticationRepository {
         final user = await dataSource.signIn(email: email, password: password);
         return Right(user);
       } catch (e) {
-        return Left(FirebaseFailure());
+        return Left(
+          Failure(
+            error: 'Somehting went wrong!',
+          ),
+        );
       }
     } else
-      return Left(ConnectionFailure());
+      return Left(
+        Failure(
+          error: 'Check your connection to internet!',
+        ),
+      );
   }
 
   @override
@@ -48,15 +63,18 @@ class AuthenticationRepositoryImpl extends AuthenticationRepository {
         final user = await dataSource.signInAuto();
         return Right(user);
       } catch (e) {
-        if (e is CacheException)
-          return Left(CacheFailure());
-        else if (e is ConnectionException)
-          return Left(ConnectionFailure());
-        else
-          return Left(ConnectionFailure());
+        return Left(
+          Failure(
+            error: 'Somehting went wrong!',
+          ),
+        );
       }
     } else
-      return Left(ConnectionFailure());
+      return Left(
+        Failure(
+          error: 'Check your connection to internet!',
+        ),
+      );
   }
 
   @override
@@ -66,9 +84,17 @@ class AuthenticationRepositoryImpl extends AuthenticationRepository {
         final success = await dataSource.signOut();
         return Right(success);
       } catch (e) {
-        return Left(FirebaseFailure());
+        return Left(
+          Failure(
+            error: 'Something went wrong!',
+          ),
+        );
       }
     } else
-      return Left(ConnectionFailure());
+      return Left(
+        Failure(
+          error: 'Check your connection to internet!',
+        ),
+      );
   }
 }

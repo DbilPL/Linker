@@ -28,5 +28,5 @@ class UserDataModel extends UserData {
   }
 
   @override
-  List<Object> get props => [groupNameList, links, name, types];
+  List<Object> get props => [groupNameList, name];
 }

@@ -35,7 +35,9 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
             );
           }
-          if (state is Entered) {}
+          if (state is Entered) {
+            Navigator.pushReplacementNamed(context, '/user');
+          }
         },
         child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
           builder: (context, state) {
@@ -61,7 +63,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       children: <Widget>[
                         Text(
                           'Sign up',
-                          style: Theme.of(context).textTheme.title,
+                          style: Theme.of(context).textTheme.headline3,
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),

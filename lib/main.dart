@@ -71,8 +71,11 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         textTheme: TextTheme(
-          title: TextStyle(
-            color: Colors.white,
+          headline3: TextStyle(
+            color: Color.fromRGBO(20, 37, 186, 1),
+          ),
+          caption: TextStyle(
+            color: Color.fromRGBO(20, 37, 186, 1),
           ),
           button: TextStyle(
             color: Colors.white,
@@ -93,6 +96,8 @@ class _MyAppState extends State<MyApp> {
             );
             print('--entered!--');
             Navigator.of(context).pushReplacementNamed('/user');
+          } else if (state is FailureAuthenticationState) {
+            Navigator.of(context).pushReplacementNamed('/sign-in');
           }
         },
         child: BlocListener<GroupTableBloc, GroupTableState>(
@@ -105,18 +110,18 @@ class _MyAppState extends State<MyApp> {
                   BlocProvider.of<UserTableBloc>(context).state;
 
               if (authState is Entered && userTableState is UserDataLoaded) {
-                final lastState = await userTableState.stream.last;
+                final lastStream = userTableState.stream;
+
+                final lastIndex = await lastStream.length;
+
+                final lastState = await lastStream.elementAt(lastIndex - 1);
 
                 UserDataModel userDataModel =
                     UserDataModel.fromJson(lastState.data)
                       ..groupNameList.add(state.groupName);
 
                 BlocProvider.of<UserTableBloc>(context).add(
-                  UpdateUserDataEvent(
-                    userDataModel,
-                    lastState.reference,
-                    state.stream,
-                  ),
+                  UpdateUserDataEvent(userDataModel, lastState.reference),
                 );
               }
             }

@@ -18,10 +18,9 @@ class LoadUserDataInitial extends UserTableEvent {
 class UpdateUserDataEvent extends UserTableEvent {
   final UserDataModel userDataModel;
   final DocumentReference reference;
-  final Stream<DocumentSnapshot> prevStream;
 
-  UpdateUserDataEvent(this.userDataModel, this.reference, this.prevStream);
+  UpdateUserDataEvent(this.userDataModel, this.reference);
 
   @override
-  List<Object> get props => [userDataModel, reference, prevStream];
+  List<Object> get props => [userDataModel, reference];
 }
