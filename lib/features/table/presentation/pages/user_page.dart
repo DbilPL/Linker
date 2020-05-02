@@ -158,7 +158,7 @@ class _UserPageState extends State<UserPage> {
                                 return LinkGroupView(
                                   links: sortedLinks[index],
                                   type: types[index],
-                                  reference: snapshot.data.reference,
+                                  snapshot: snapshot.data,
                                 );
                               },
                             ),

@@ -42,6 +42,7 @@ dev_dependencies:
 flutter:
   assets:
     - assets/images/app_icon.svg
+    - assets/flare_animations/intro.flr
 
 
   uses-material-design: true

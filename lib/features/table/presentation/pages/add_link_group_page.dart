@@ -26,157 +26,179 @@ class _AddLinkGroupPageState extends State<AddLinkGroupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            TextFormField(
-              decoration: InputDecoration(labelText: 'Group name'),
-              controller: _groupNameController,
-            ),
-            ListTile(
-              title: Text('Importance'),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.add),
-                  onPressed: () {
-                    changeImportance(1);
-                  },
+      body: Builder(builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Group name'),
+                controller: _groupNameController,
+              ),
+              ListTile(
+                title: Text('Importance'),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.add),
+                    onPressed: () {
+                      changeImportance(1);
+                    },
+                  ),
+                  Text(
+                    '$importanceValue',
+                    style: Theme.of(context).textTheme.headline4,
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.remove),
+                    onPressed: () {
+                      changeImportance(-1);
+                    },
+                  ),
+                ],
+              ),
+              ListTile(
+                onTap: () {
+                  _openColorPicker();
+                },
+                title: Text(
+                  'Pick color',
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                  ),
                 ),
-                Text(
-                  '$importanceValue',
-                  style: Theme.of(context).textTheme.headline4,
-                ),
-                IconButton(
-                  icon: Icon(Icons.remove),
-                  onPressed: () {
-                    changeImportance(-1);
-                  },
-                ),
-              ],
-            ),
-            ListTile(
-              onTap: () {
-                _openColorPicker();
-              },
-              title: Text(
-                'Pick color',
-                style: TextStyle(
-                  color: Theme.of(context).primaryColor,
+                trailing: Container(
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    color: selectedColor,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
                 ),
               ),
-              trailing: Container(
-                width: 30,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: selectedColor,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              ),
-            ),
-            RaisedButton(
-              onPressed: () async {
-                if (_groupNameController.text != '') {
-                  UserDataModel prevUserData =
-                      UserDataModel.fromJson(widget.snapshot.data);
-
-                  if (prevUserData.table == null) {
-                    final prevUserData =
+              RaisedButton(
+                onPressed: () async {
+                  if (_groupNameController.text != '') {
+                    bool isExist = false;
+                    UserDataModel prevUserData =
                         UserDataModel.fromJson(widget.snapshot.data);
-                    final newUserData = UserDataModel(
-                      name: prevUserData.name,
-                      groupNameList: prevUserData.groupNameList,
-                      table: UserLinkTableModel(
-                        links: [],
-                        types: []..add(
+
+                    if (prevUserData.table == null) {
+                      final prevUserData =
+                          UserDataModel.fromJson(widget.snapshot.data);
+                      final newUserData = UserDataModel(
+                        name: prevUserData.name,
+                        groupNameList: prevUserData.groupNameList,
+                        table: UserLinkTableModel(
+                          links: [],
+                          types: []..add(
+                              LinkTypeModel(
+                                importance: importanceValue,
+                                name: _groupNameController.text,
+                                color: selectedColor,
+                              ),
+                            ),
+                        ),
+                      );
+                      BlocProvider.of<UserTableBloc>(context).add(
+                        UpdateUserDataEvent(
+                          newUserData,
+                          widget.snapshot.reference,
+                        ),
+                      );
+                    } else {
+                      final prevUserData =
+                          UserDataModel.fromJson(widget.snapshot.data);
+
+                      List<LinkTypeModel> types =
+                          List.from(prevUserData.table.types);
+
+                      if (types.length != 0) {
+                        int number;
+
+                        for (int i = 0; i < types.length; i++) {
+                          final currentType = types[i];
+                          final nextType =
+                              i == types.length ? types[i] : types[i + 1];
+                          if (currentType.importance >= importanceValue &&
+                              nextType.importance <= importanceValue) {
+                            number = i + 1;
+                          } else if (currentType.importance <=
+                              importanceValue) {
+                            number = 0;
+                          }
+                          if (number != null) break;
+                        }
+
+                        types.forEach(
+                          (element) {
+                            if (element.name == _groupNameController.text) {
+                              isExist = true;
+                            }
+                          },
+                        );
+
+                        if (!isExist) {
+                          types.insert(
+                            number,
                             LinkTypeModel(
                               importance: importanceValue,
                               name: _groupNameController.text,
                               color: selectedColor,
                             ),
-                          ),
-                      ),
-                    );
-                    BlocProvider.of<UserTableBloc>(context).add(
-                      UpdateUserDataEvent(
-                        newUserData,
-                        widget.snapshot.reference,
-                      ),
-                    );
-                  } else {
-                    final prevUserData =
-                        UserDataModel.fromJson(widget.snapshot.data);
-
-                    List<LinkTypeModel> types =
-                        List.from(prevUserData.table.types);
-
-                    if (types.length != 0) {
-                      int number;
-
-                      for (int i = 0; i < types.length; i++) {
-                        final currentType = types[i];
-                        final nextType =
-                            i == types.length ? types[i] : types[i + 1];
-                        if (currentType.importance >= importanceValue &&
-                            nextType.importance <= importanceValue) {
-                          number = i + 1;
-                        } else if (currentType.importance <= importanceValue) {
-                          number = 0;
+                          );
+                        } else {
+                          Scaffold.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'This group already exist!',
+                              ),
+                              backgroundColor: Theme.of(context).errorColor,
+                            ),
+                          );
                         }
-                        if (number != null) break;
+                      } else {
+                        types.add(
+                          LinkTypeModel(
+                            importance: importanceValue,
+                            name: _groupNameController.text,
+                            color: selectedColor,
+                          ),
+                        );
                       }
 
-                      print('2 $number');
+                      final newUserDataModel = UserDataModel(
+                        groupNameList: prevUserData.groupNameList,
+                        name: prevUserData.name,
+                        table: UserLinkTableModel(
+                          links: prevUserData.table.links,
+                          types: types,
+                        ),
+                      );
 
-                      types.insert(
-                        number,
-                        LinkTypeModel(
-                          importance: importanceValue,
-                          name: _groupNameController.text,
-                          color: selectedColor,
+                      BlocProvider.of<UserTableBloc>(context).add(
+                        UpdateUserDataEvent(
+                          newUserDataModel,
+                          widget.snapshot.reference,
                         ),
                       );
-                    } else {
-                      types.add(
-                        LinkTypeModel(
-                          importance: importanceValue,
-                          name: _groupNameController.text,
-                          color: selectedColor,
-                        ),
-                      );
-                      print('1');
                     }
-
-                    final newUserDataModel = UserDataModel(
-                      groupNameList: prevUserData.groupNameList,
-                      name: prevUserData.name,
-                      table: UserLinkTableModel(
-                        links: prevUserData.table.links,
-                        types: types,
-                      ),
-                    );
-
-                    BlocProvider.of<UserTableBloc>(context).add(
-                      UpdateUserDataEvent(
-                        newUserDataModel,
-                        widget.snapshot.reference,
-                      ),
-                    );
+                    if (!isExist) {
+                      Navigator.pop(context);
+                    }
                   }
-                  Navigator.pop(context);
-                }
-              },
-              child: Text(
-                'Add',
-                style: Theme.of(context).textTheme.button,
+                },
+                child: Text(
+                  'Add',
+                  style: Theme.of(context).textTheme.button,
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
+            ],
+          ),
+        );
+      }),
     );
   }
 

@@ -4,15 +4,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:linker/features/table/data/model/link_model.dart';
 import 'package:linker/features/table/data/model/link_type_model.dart';
+import 'package:linker/features/table/presentation/pages/add_link_page.dart';
 
 import 'link_view.dart';
 
 class LinkGroupView extends StatefulWidget {
   final LinkTypeModel type;
   final List<LinkModel> links;
-  final DocumentReference reference;
+  final DocumentSnapshot snapshot;
 
-  LinkGroupView({Key key, this.type, this.links, this.reference})
+  LinkGroupView({Key key, this.type, this.links, this.snapshot})
       : super(key: key);
 
   @override
@@ -65,7 +66,14 @@ class _LinkGroupViewState extends State<LinkGroupView> {
                 trailing: IconButton(
                   icon: Icon(Icons.add),
                   onPressed: () {
-                    print('add');
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => AddLinkPage(
+                          snapshot: widget.snapshot,
+                          type: widget.type,
+                        ),
+                      ),
+                    );
                   },
                 ),
               ),
@@ -73,7 +81,7 @@ class _LinkGroupViewState extends State<LinkGroupView> {
                 widget.links.length != 0
                     ? isFullView
                         ? Iterable.generate(
-                            3,
+                            widget.links.length < 4 ? widget.links.length : 3,
                             (index) => LinkView(
                               link: widget.links[index],
                             ),

@@ -13,6 +13,22 @@ class LinkView extends StatefulWidget {
 class _LinkViewState extends State<LinkView> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    final size = MediaQuery.of(context).size;
+
+    return Container(
+      width: size.width,
+      height: 50,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(widget.link.title),
+            Text(widget.link.link),
+            Icon(Icons.share),
+          ],
+        ),
+      ),
+    );
   }
 }

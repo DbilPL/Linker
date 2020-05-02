@@ -1,3 +1,4 @@
+import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:linker/core/presentation/pages/loading_page.dart';
@@ -133,7 +134,10 @@ class _MyAppState extends State<MyApp> {
                 // introduction animation
                 return Scaffold(
                   body: Center(
-                    child: Text('Animation'),
+                    child: FlareActor(
+                      'assets/flare_animations/intro.flr',
+                      animation: 'Untitled',
+                    ),
                   ),
                 );
               }
