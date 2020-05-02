@@ -9,7 +9,6 @@ import 'package:linker/features/table/data/model/user_data_model.dart';
 import 'package:linker/features/table/presentation/bloc/bloc.dart';
 import 'package:linker/features/table/presentation/pages/add_link_group_page.dart';
 import 'package:linker/features/table/presentation/widgets/link_group_view.dart';
-import 'package:rxdart/rxdart.dart';
 
 class UserPage extends StatefulWidget {
   @override
@@ -18,8 +17,6 @@ class UserPage extends StatefulWidget {
 
 class _UserPageState extends State<UserPage> {
   Stream<DocumentSnapshot> stream;
-
-  BehaviorSubject<DocumentSnapshot> user = BehaviorSubject<DocumentSnapshot>();
 
   @override
   void initState() {
@@ -66,42 +63,6 @@ class _UserPageState extends State<UserPage> {
                 );
               else
                 return Scaffold(
-                  appBar: AppBar(
-                    title: Text(
-                      'Main page',
-                      style: Theme.of(context).textTheme.title,
-                    ),
-                    actions: <Widget>[
-                      IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: () {},
-                      ),
-                      state is InitialUserTableState ||
-                              state is LoadingUserTableState
-                          ? CircularProgressIndicator()
-                          : SizedBox(),
-                    ],
-                  ),
-                  drawer: Drawer(),
-                  bottomNavigationBar: BottomAppBar(
-                    color: Theme.of(context).primaryColor,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.add_circle_outline,
-                        size: 37,
-                        color: Theme.of(context).backgroundColor,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => AddLinkGroupPage(
-                              snapshot: user.value,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
                   body: StreamBuilder(
                     stream: stream,
                     builder:
@@ -109,8 +70,6 @@ class _UserPageState extends State<UserPage> {
                       if (snapshot.hasData) {
                         final userTableDataFromFirebase =
                             UserDataModel.fromJson(snapshot.data.data);
-
-                        user.add(snapshot.data);
 
                         if ((userTableDataFromFirebase != null &&
                                 userTableDataFromFirebase.table != null) ||
@@ -135,14 +94,74 @@ class _UserPageState extends State<UserPage> {
                             }
                           }
 
-                          return ListView.builder(
-                            itemCount: types.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return LinkGroupView(
-                                links: sortedLinks[index],
-                                type: types[index],
-                              );
-                            },
+                          return Scaffold(
+                            appBar: AppBar(
+                              title: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey,
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.person,
+                                    size: 30,
+                                  ),
+                                ],
+                              ),
+                              actions: <Widget>[
+                                IconButton(
+                                  icon: Icon(Icons.edit),
+                                  onPressed: () {},
+                                ),
+                              ],
+                            ),
+                            drawer: Drawer(
+                              elevation: 0.0,
+                              child: ListView(
+                                children: [
+                                  UserAccountsDrawerHeader(
+                                    accountName:
+                                        Text(userTableDataFromFirebase.name),
+                                    accountEmail:
+                                        Text(authState.userModel.email),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            bottomNavigationBar: BottomAppBar(
+                              color: Theme.of(context).primaryColor,
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.add_circle_outline,
+                                  size: 37,
+                                  color: Theme.of(context).backgroundColor,
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => AddLinkGroupPage(
+                                        snapshot: snapshot.data,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            body: ListView.builder(
+                              itemCount: types.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return LinkGroupView(
+                                  links: sortedLinks[index],
+                                  type: types[index],
+                                  reference: snapshot.data.reference,
+                                );
+                              },
+                            ),
                           );
                         } else
                           return Center(

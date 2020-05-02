@@ -4,7 +4,6 @@ import 'package:linker/core/presentation/pages/loading_page.dart';
 import 'package:linker/features/group_table/presentation/bloc/bloc.dart';
 import 'package:linker/features/table/data/model/user_data_model.dart';
 import 'package:linker/features/table/presentation/bloc/bloc.dart';
-import 'package:linker/features/table/presentation/pages/add_link_group_page.dart';
 import 'package:linker/injection_container.dart';
 
 import 'core/bloc_delegate.dart';
@@ -74,6 +73,9 @@ class _MyAppState extends State<MyApp> {
           headline3: TextStyle(
             color: Color.fromRGBO(20, 37, 186, 1),
           ),
+          headline5: TextStyle(
+            color: Colors.white,
+          ),
           caption: TextStyle(
             color: Color.fromRGBO(20, 37, 186, 1),
           ),
@@ -86,7 +88,6 @@ class _MyAppState extends State<MyApp> {
         '/sign-up': (context) => SignUpPage(),
         '/sign-in': (context) => SignInPage(),
         '/user': (context) => UserPage(),
-        '/add-link-group': (context) => AddLinkGroupPage(),
       },
       home: BlocListener<AuthenticationBloc, AuthenticationState>(
         listener: (context, state) async {
