@@ -28,6 +28,17 @@ class AddNewLinkTypeEvent extends UserTableEvent {
   List<Object> get props => [type, prevUserDataModel, reference];
 }
 
+class DeleteLinkType extends UserTableEvent {
+  final LinkTypeModel type;
+  final UserDataModel prevUserData;
+  final DocumentReference reference;
+
+  DeleteLinkType(this.type, this.prevUserData, this.reference);
+
+  @override
+  List<Object> get props => [type, prevUserData, reference];
+}
+
 class AddNewLinkEvent extends UserTableEvent {
   final LinkModel link;
   final UserDataModel prevUserDataModel;

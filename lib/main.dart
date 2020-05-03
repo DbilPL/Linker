@@ -66,6 +66,11 @@ class _MyAppState extends State<MyApp> {
         appBarTheme: AppBarTheme(
           elevation: 0.0,
           color: Color.fromRGBO(156, 169, 237, 1),
+          textTheme: TextTheme(
+            subtitle1: TextStyle(
+              color: Colors.white,
+            ),
+          ),
           iconTheme: IconThemeData(
             color: Colors.white,
           ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:linker/features/table/data/model/link_model.dart';
 import 'package:linker/features/table/data/model/link_type_model.dart';
 import 'package:linker/features/table/data/model/user_data_model.dart';
 import 'package:linker/features/table/data/model/user_link_table_model.dart';
@@ -178,6 +179,20 @@ class UserTableBloc extends Bloc<UserTableEvent, UserTableState> {
       } else
         yield FailureUserTableState('Write non-null title!');
     }
+
+    if (event is DeleteLinkType) {
+      yield LoadingUserTableState();
+
+      final types = List.from(event.prevUserData.table.types);
+
+      types.retainWhere((element) => element != event.type);
+
+      final links = List.from(event.prevUserData.table.links);
+
+      links.retainWhere(
+          (element) => (element as LinkModel).type == event.type.name);
+    }
+
     if (event is UpdateUserDataEvent) {
       final result = await _updateUserData(
         UpdateUserDataParams(

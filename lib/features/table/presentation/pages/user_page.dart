@@ -18,6 +18,7 @@ class UserPage extends StatefulWidget {
 
 class _UserPageState extends State<UserPage> {
   Stream<DocumentSnapshot> stream;
+  bool isEditing = false;
 
   @override
   void initState() {
@@ -105,9 +106,22 @@ class _UserPageState extends State<UserPage> {
                                 ],
                               ),
                               actions: <Widget>[
+                                Center(
+                                  child: Text(
+                                    isEditing ? 'Complete' : 'Edit',
+                                    style: AppBarTheme.of(context)
+                                        .textTheme
+                                        .subtitle1,
+                                  ),
+                                ),
                                 IconButton(
-                                  icon: Icon(Icons.edit),
-                                  onPressed: () {},
+                                  icon: Icon(
+                                      isEditing ? Icons.check : Icons.edit),
+                                  onPressed: () {
+                                    setState(() {
+                                      isEditing = !isEditing;
+                                    });
+                                  },
                                 ),
                               ],
                             ),
@@ -150,6 +164,7 @@ class _UserPageState extends State<UserPage> {
                                   links: sortedLinks[index],
                                   type: types[index],
                                   snapshot: snapshot.data,
+                                  isEditing: isEditing,
                                 );
                               },
                             ),

@@ -14,7 +14,8 @@ class UserDataModel extends UserData {
   static UserDataModel fromJson(Map<String, dynamic> json) {
     return UserDataModel(
       name: json['name'],
-      groupNameList: json['group_names'],
+      groupNameList:
+          json['group_names'].map<String>((v) => v.toString()).toList(),
       table: UserLinkTableModel.fromJson(json['user_link_table']),
     );
   }
