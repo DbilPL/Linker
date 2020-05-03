@@ -39,6 +39,7 @@ class _LinkGroupViewState extends State<LinkGroupView> {
               ListTile(
                 title: Row(
                   children: [
+                    Text(widget.type.importance.toString()),
                     TweenAnimationBuilder(
                       duration: Duration(milliseconds: 150),
                       tween: Tween<double>(
@@ -79,7 +80,7 @@ class _LinkGroupViewState extends State<LinkGroupView> {
               ),
             ]..addAll(
                 widget.links.length != 0
-                    ? isFullView
+                    ? !isFullView
                         ? Iterable.generate(
                             widget.links.length < 4 ? widget.links.length : 3,
                             (index) => LinkView(

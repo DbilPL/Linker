@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:linker/features/table/data/model/link_model.dart';
 import 'package:linker/features/table/data/model/link_type_model.dart';
 import 'package:linker/features/table/data/model/user_data_model.dart';
-import 'package:linker/features/table/data/model/user_link_table_model.dart';
 import 'package:linker/features/table/presentation/bloc/bloc.dart';
 
 class AddLinkPage extends StatefulWidget {
@@ -32,57 +31,73 @@ class _AddLinkPageState extends State<AddLinkPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            TextFormField(
-              controller: _titleController,
-              decoration: InputDecoration(
-                labelText: 'Title',
-              ),
-            ),
-            TextFormField(
-              controller: _linkController,
-              decoration: InputDecoration(
-                labelText: 'Link',
-              ),
-            ),
-            RaisedButton(
-              onPressed: () {
-                if (_titleController.text != '' && _linkController.text != '') {
-                  final prevUserDataModel =
-                      UserDataModel.fromJson(widget.snapshot.data);
+        child: BlocListener<UserTableBloc, UserTableState>(
+          listener: (context, state) {
+            if (state is UserDataLoaded) {
+              Navigator.pop(context);
+            }
+            if (state is FailureUserTableState) {
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Theme.of(context).errorColor,
+                ),
+              );
+            }
+          },
+          child: BlocBuilder<UserTableBloc, UserTableState>(
+            builder: (context, state) {
+              return Column(
+                children: [
+                  TextFormField(
+                    controller: _titleController,
+                    decoration: InputDecoration(
+                      labelText: 'Title',
+                    ),
+                  ),
+                  TextFormField(
+                    controller: _linkController,
+                    decoration: InputDecoration(
+                      labelText: 'Link',
+                    ),
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  state is LoadingUserTableState
+                      ? CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Theme.of(context).primaryColor,
+                          ),
+                        )
+                      : RaisedButton(
+                          onPressed: () {
+                            final prevUserDataModel =
+                                UserDataModel.fromJson(widget.snapshot.data);
 
-                  final newUserDataModel = UserDataModel(
-                    name: prevUserDataModel.name,
-                    groupNameList: prevUserDataModel.groupNameList,
-                    table: UserLinkTableModel(
-                      types: prevUserDataModel.table.types,
-                      links: prevUserDataModel.table.links
-                        ..add(
-                          LinkModel(
-                            type: widget.type.name,
-                            title: _titleController.text,
-                            link: _linkController.text,
+                            final link = LinkModel(
+                              type: widget.type.name,
+                              title: _titleController.text,
+                              link: _linkController.text,
+                            );
+
+                            BlocProvider.of<UserTableBloc>(context).add(
+                              AddNewLinkEvent(
+                                link,
+                                prevUserDataModel,
+                                widget.snapshot.reference,
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'Add',
+                            style: Theme.of(context).textTheme.button,
                           ),
                         ),
-                    ),
-                  );
-
-                  BlocProvider.of<UserTableBloc>(context).add(
-                    UpdateUserDataEvent(
-                      newUserDataModel,
-                      widget.snapshot.reference,
-                    ),
-                  );
-                  Navigator.pop(context);
-                }
-              },
-              child: Text(
-                'Add',
-                style: Theme.of(context).textTheme.button,
-              ),
-            ),
-          ],
+                ],
+              );
+            },
+          ),
         ),
       ),
     );

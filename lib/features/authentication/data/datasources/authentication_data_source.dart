@@ -83,6 +83,9 @@ class AuthenticationDataSourceImpl extends AuthenticationDataSource {
           uid: user.uid,
         );
 
+        await sharedPreferences.setString(
+            _authenticationKey, jsonEncode(newUser.toJson()));
+
         return newUser;
       } else
         throw NoUserException();

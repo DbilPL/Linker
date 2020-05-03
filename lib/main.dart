@@ -98,7 +98,12 @@ class _MyAppState extends State<MyApp> {
             );
             print('--entered!--');
             Navigator.of(context).pushReplacementNamed('/user');
-          } else if (state is FailureAuthenticationState) {
+          }
+
+          if (state is FailureAuthenticationState) {
+            await Future.delayed(
+              Duration(seconds: 4),
+            );
             Navigator.of(context).pushReplacementNamed('/sign-in');
           }
         },

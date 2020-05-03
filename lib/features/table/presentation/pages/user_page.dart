@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:linker/core/presentation/pages/loading_page.dart';
 import 'package:linker/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:linker/features/authentication/presentation/bloc/bloc.dart';
 import 'package:linker/features/table/data/model/link_model.dart';
@@ -39,16 +40,6 @@ class _UserPageState extends State<UserPage> {
                 stream = state.stream;
               });
           }
-          if (state is FailureUserTableState) {
-            Scaffold.of(context).showSnackBar(
-              SnackBar(
-                backgroundColor: Theme.of(context).errorColor,
-                content: Text(
-                  state.message,
-                ),
-              ),
-            );
-          }
         },
         child: BlocBuilder<UserTableBloc, UserTableState>(
           builder: (context, state) {
@@ -59,7 +50,7 @@ class _UserPageState extends State<UserPage> {
               if (stream == null)
                 return Scaffold(
                   appBar: AppBar(),
-                  body: Container(),
+                  body: LoadingPage(),
                 );
               else
                 return Scaffold(
@@ -72,7 +63,7 @@ class _UserPageState extends State<UserPage> {
                             UserDataModel.fromJson(snapshot.data.data);
 
                         if ((userTableDataFromFirebase != null &&
-                                userTableDataFromFirebase.table != null) ||
+                                userTableDataFromFirebase.table != null) &&
                             userTableDataFromFirebase.table.types != []) {
                           final List<LinkTypeModel> types =
                               userTableDataFromFirebase.table.types;
@@ -170,7 +161,7 @@ class _UserPageState extends State<UserPage> {
                       } else if (snapshot.hasError)
                         return Container();
                       else
-                        return Container();
+                        return LoadingPage();
                     },
                     initialData: null,
                   ),
