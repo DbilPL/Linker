@@ -108,11 +108,24 @@ class _LinkGroupViewState extends State<LinkGroupView> {
                       ? Iterable.generate(
                           widget.links.length,
                           (index) => Dismissible(
-                            onDismissed: (direction) {},
-                            direction: DismissDirection.startToEnd,
                             background: Container(
                               color: Colors.redAccent,
                             ),
+                            secondaryBackground: Container(
+                              color: Colors.redAccent,
+                            ),
+                            onDismissed: (direction) {
+                              final prevUserDataModel =
+                                  UserDataModel.fromJson(widget.snapshot.data);
+
+                              BlocProvider.of<UserTableBloc>(context).add(
+                                DeleteLink(
+                                  widget.links[index],
+                                  prevUserDataModel,
+                                  widget.snapshot.reference,
+                                ),
+                              );
+                            },
                             key: Key(index.toString()),
                             child: LinkView(
                               link: widget.links[index],

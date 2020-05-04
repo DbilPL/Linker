@@ -32,7 +32,7 @@ class UserTableBloc extends Bloc<UserTableEvent, UserTableState> {
         return UserDataLoaded(success);
       });
     }
-    if (event is AddNewLinkEvent) {
+    if (event is AddNewLink) {
       yield LoadingUserTableState();
       if (event.link.title != '' && event.link.link != '') {
         final newUserDataModel = UserDataModel(
@@ -108,7 +108,10 @@ class UserTableBloc extends Bloc<UserTableEvent, UserTableState> {
                   nextType.importance <= event.type.importance) {
                 number = i + 1;
               } else if (currentType.importance <= event.type.importance) {
-                number = 0;
+                number = i;
+              } else if (i == types.length - 1 &&
+                  currentType.importance >= event.type.importance) {
+                number = types.length;
               }
               if (number != null) break;
             }
@@ -122,6 +125,7 @@ class UserTableBloc extends Bloc<UserTableEvent, UserTableState> {
             );
 
             if (!isExist) {
+              print(number);
               types.insert(
                 number,
                 event.type,
@@ -214,10 +218,23 @@ class UserTableBloc extends Bloc<UserTableEvent, UserTableState> {
       );
     }
 
-    if (event is UpdateUserDataEvent) {
+    if (event is DeleteLink) {
+      final links = event.prevUserDataModel.table.links;
+
+      links.removeWhere((element) => element == event.link);
+
+      final newUserDataModel = UserDataModel(
+        groupNameList: event.prevUserDataModel.groupNameList,
+        name: event.prevUserDataModel.name,
+        table: UserLinkTableModel(
+          links: links,
+          types: event.prevUserDataModel.table.types,
+        ),
+      );
+
       final result = await _updateUserData(
         UpdateUserDataParams(
-          newUserData: event.userDataModel,
+          newUserData: newUserDataModel,
           reference: event.reference,
         ),
       );

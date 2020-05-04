@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:linker/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:linker/features/authentication/presentation/bloc/authentication_event.dart';
 import 'package:linker/features/authentication/presentation/bloc/authentication_state.dart';
@@ -49,12 +50,23 @@ class _SignInPageState extends State<SignInPage> {
               );
             }
             if (state is FailureAuthenticationState) {
-              return Container(
-                child: Center(
-                  child: Container(
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
+                  SvgPicture.asset(
+                    'assets/images/auth_bg.svg',
+                    fit: BoxFit.fill,
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
+                  Container(
                     width: MediaQuery.of(context).size.width * 0.75,
                     height: MediaQuery.of(context).size.height * 0.75,
-                    color: Color.fromRGBO(186, 228, 229, 1),
+                    color: Color.fromRGBO(186, 228, 229, 0.9),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
@@ -135,7 +147,7 @@ class _SignInPageState extends State<SignInPage> {
                       ],
                     ),
                   ),
-                ),
+                ],
               );
             } else
               return Container();

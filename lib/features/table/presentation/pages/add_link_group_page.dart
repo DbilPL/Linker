@@ -42,83 +42,93 @@ class _AddLinkGroupPageState extends State<AddLinkGroupPage> {
             );
           }
         },
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Group name'),
-                controller: _groupNameController,
-              ),
-              ListTile(
-                title: Text('Importance'),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+        child: BlocBuilder<UserTableBloc, UserTableState>(
+          builder: (context, state) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
                 children: [
-                  IconButton(
-                    icon: Icon(Icons.add),
-                    onPressed: () {
-                      changeImportance(1);
+                  TextFormField(
+                    decoration: InputDecoration(labelText: 'Group name'),
+                    controller: _groupNameController,
+                  ),
+                  ListTile(
+                    title: Text('Importance'),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.add),
+                        onPressed: () {
+                          changeImportance(1);
+                        },
+                      ),
+                      Text(
+                        '$importanceValue',
+                        style: Theme.of(context).textTheme.headline4,
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.remove),
+                        onPressed: () {
+                          changeImportance(-1);
+                        },
+                      ),
+                    ],
+                  ),
+                  ListTile(
+                    onTap: () {
+                      _openColorPicker();
                     },
+                    title: Text(
+                      'Pick color',
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    trailing: Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: selectedColor,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
                   ),
-                  Text(
-                    '$importanceValue',
-                    style: Theme.of(context).textTheme.headline4,
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.remove),
-                    onPressed: () {
-                      changeImportance(-1);
-                    },
-                  ),
+                  state is LoadingUserTableState
+                      ? CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Theme.of(context).primaryColor,
+                          ),
+                        )
+                      : RaisedButton(
+                          onPressed: () async {
+                            final UserDataModel prevUserData =
+                                UserDataModel.fromJson(widget.snapshot.data);
+
+                            final LinkTypeModel type = LinkTypeModel(
+                              importance: importanceValue,
+                              name: _groupNameController.text,
+                              color: selectedColor,
+                            );
+
+                            BlocProvider.of<UserTableBloc>(context).add(
+                              AddNewLinkTypeEvent(
+                                type,
+                                prevUserData,
+                                widget.snapshot.reference,
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'Add',
+                            style: Theme.of(context).textTheme.button,
+                          ),
+                        ),
                 ],
               ),
-              ListTile(
-                onTap: () {
-                  _openColorPicker();
-                },
-                title: Text(
-                  'Pick color',
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-                trailing: Container(
-                  width: 30,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    color: selectedColor,
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                ),
-              ),
-              RaisedButton(
-                onPressed: () async {
-                  final UserDataModel prevUserData =
-                      UserDataModel.fromJson(widget.snapshot.data);
-
-                  final LinkTypeModel type = LinkTypeModel(
-                    importance: importanceValue,
-                    name: _groupNameController.text,
-                    color: selectedColor,
-                  );
-
-                  BlocProvider.of<UserTableBloc>(context).add(
-                    AddNewLinkTypeEvent(
-                      type,
-                      prevUserData,
-                      widget.snapshot.reference,
-                    ),
-                  );
-                },
-                child: Text(
-                  'Add',
-                  style: Theme.of(context).textTheme.button,
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );

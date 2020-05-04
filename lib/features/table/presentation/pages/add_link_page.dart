@@ -82,7 +82,7 @@ class _AddLinkPageState extends State<AddLinkPage> {
                             );
 
                             BlocProvider.of<UserTableBloc>(context).add(
-                              AddNewLinkEvent(
+                              AddNewLink(
                                 link,
                                 prevUserDataModel,
                                 widget.snapshot.reference,
