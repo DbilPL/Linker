@@ -183,14 +183,35 @@ class UserTableBloc extends Bloc<UserTableEvent, UserTableState> {
     if (event is DeleteLinkType) {
       yield LoadingUserTableState();
 
-      final types = List.from(event.prevUserData.table.types);
+      final List<LinkTypeModel> types =
+          List.from(event.prevUserData.table.types);
 
       types.retainWhere((element) => element != event.type);
 
-      final links = List.from(event.prevUserData.table.links);
+      final List<LinkModel> links = List.from(event.prevUserData.table.links);
 
-      links.retainWhere(
-          (element) => (element as LinkModel).type == event.type.name);
+      links.retainWhere((element) => element.type != event.type.name);
+
+      final newUserDataModel = UserDataModel(
+        groupNameList: event.prevUserData.groupNameList,
+        name: event.prevUserData.name,
+        table: UserLinkTableModel(
+          links: links,
+          types: types,
+        ),
+      );
+
+      final result = await _updateUserData(
+        UpdateUserDataParams(
+          newUserData: newUserDataModel,
+          reference: event.reference,
+        ),
+      );
+
+      yield result.fold(
+        (failure) => FailureUserTableState(failure.error),
+        (success) => UserDataLoaded(null),
+      );
     }
 
     if (event is UpdateUserDataEvent) {
