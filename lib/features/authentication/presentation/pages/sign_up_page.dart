@@ -18,6 +18,8 @@ class _SignUpPageState extends State<SignUpPage> {
   TextEditingController _passwordController = TextEditingController(text: '');
   TextEditingController _nameController = TextEditingController(text: '');
 
+  bool _obscureText = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,8 +53,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
               );
-            }
-            if (state is FailureAuthenticationState) {
+            } else {
               return Stack(
                 alignment: Alignment.center,
                 children: [
@@ -65,6 +66,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     fit: BoxFit.fill,
                     width: double.infinity,
                     height: double.infinity,
+                    color: Color.fromRGBO(0, 0, 255, 0.3),
                   ),
                   Container(
                     width: MediaQuery.of(context).size.width * 0.75,
@@ -98,9 +100,15 @@ class _SignUpPageState extends State<SignUpPage> {
                               TextFormField(
                                 decoration: InputDecoration(
                                   labelText: 'Password',
+                                  suffixIcon: GestureDetector(
+                                    onTap: togglePasswordVisibility,
+                                    child: !_obscureText
+                                        ? Icon(Icons.visibility)
+                                        : Icon(Icons.visibility_off),
+                                  ),
                                 ),
-                                keyboardType: TextInputType.visiblePassword,
                                 controller: _passwordController,
+                                obscureText: _obscureText,
                               ),
                             ],
                           ),
@@ -125,11 +133,16 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ],
               );
-            } else
-              return Container();
+            }
           },
         ),
       ),
     );
+  }
+
+  void togglePasswordVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
   }
 }

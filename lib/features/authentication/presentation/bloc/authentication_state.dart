@@ -26,9 +26,14 @@ class FailureAuthenticationState extends AuthenticationState {
 
 class Entered extends AuthenticationState {
   final UserModel userModel;
-
-  Entered(this.userModel);
+  final String msg;
+  Entered(this.userModel, {this.msg});
 
   @override
   List<Object> get props => [userModel];
+}
+
+class SignedOut extends AuthenticationState {
+  @override
+  List<Object> get props => [];
 }

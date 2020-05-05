@@ -17,6 +17,7 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   TextEditingController _emailController = TextEditingController(text: '');
   TextEditingController _passwordController = TextEditingController(text: '');
+  bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
@@ -48,8 +49,7 @@ class _SignInPageState extends State<SignInPage> {
                   ),
                 ),
               );
-            }
-            if (state is FailureAuthenticationState) {
+            } else {
               return Stack(
                 alignment: Alignment.center,
                 children: [
@@ -62,6 +62,7 @@ class _SignInPageState extends State<SignInPage> {
                     fit: BoxFit.fill,
                     width: double.infinity,
                     height: double.infinity,
+                    color: Color.fromRGBO(0, 0, 255, 0.3),
                   ),
                   Container(
                     width: MediaQuery.of(context).size.width * 0.75,
@@ -89,9 +90,16 @@ class _SignInPageState extends State<SignInPage> {
                               TextFormField(
                                 decoration: InputDecoration(
                                   labelText: 'Password',
+                                  suffixIcon: GestureDetector(
+                                    onTap: togglePasswordVisibility,
+                                    child: !_obscureText
+                                        ? Icon(Icons.visibility)
+                                        : Icon(Icons.visibility_off),
+                                  ),
                                 ),
                                 controller: _passwordController,
                                 keyboardType: TextInputType.visiblePassword,
+                                obscureText: _obscureText,
                               ),
                             ],
                           ),
@@ -149,11 +157,16 @@ class _SignInPageState extends State<SignInPage> {
                   ),
                 ],
               );
-            } else
-              return Container();
+            }
           },
         ),
       ),
     );
+  }
+
+  void togglePasswordVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
   }
 }

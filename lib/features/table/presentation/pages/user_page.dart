@@ -33,175 +33,213 @@ class _UserPageState extends State<UserPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocListener<UserTableBloc, UserTableState>(
-        listener: (BuildContext context, UserTableState state) {
-          if (state is UserDataLoaded) {
-            if (state.stream != null)
-              setState(() {
-                stream = state.stream;
-              });
+      body: BlocListener<AuthenticationBloc, AuthenticationState>(
+        listener: (context, state) {
+          if (state is SignedOut) {
+            Navigator.of(context).pushReplacementNamed('/sign-in');
           }
-        },
-        child: BlocBuilder<UserTableBloc, UserTableState>(
-          builder: (context, state) {
-            final authState =
-                BlocProvider.of<AuthenticationBloc>(context).state;
-
-            if (authState is Entered) {
-              if (stream == null)
-                return Scaffold(
-                  appBar: AppBar(),
-                  body: LoadingPage(),
-                );
-              else
-                return Scaffold(
-                  body: StreamBuilder(
-                    stream: stream,
-                    builder:
-                        (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                      if (snapshot.hasData) {
-                        final userTableDataFromFirebase =
-                            UserDataModel.fromJson(snapshot.data.data);
-
-                        if ((userTableDataFromFirebase != null &&
-                            userTableDataFromFirebase.table != null)) {
-                          final List<LinkTypeModel> types =
-                              userTableDataFromFirebase.table.types;
-
-                          final List<LinkModel> links =
-                              userTableDataFromFirebase.table.links;
-
-                          List<List<LinkModel>> sortedLinks = [];
-
-                          for (int i = 0; i < types.length; i++) {
-                            sortedLinks.add([]);
-                          }
-
-                          for (int i = 0; i < links.length; i++) {
-                            for (int j = 0; j < types.length; j++) {
-                              if (links[i].type == types[j].name) {
-                                sortedLinks[j].add(links[i]);
-                              }
-                            }
-                          }
-
-                          return Scaffold(
-                            appBar: AppBar(
-                              title: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey,
-                                      borderRadius: BorderRadius.circular(25),
-                                    ),
-                                  ),
-                                  Icon(
-                                    Icons.person,
-                                    size: 30,
-                                  ),
-                                ],
-                              ),
-                              actions: <Widget>[
-                                Center(
-                                  child: Text(
-                                    isEditing ? 'Complete' : 'Edit',
-                                    style: AppBarTheme.of(context)
-                                        .textTheme
-                                        .subtitle1,
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: Icon(
-                                      isEditing ? Icons.check : Icons.edit),
-                                  onPressed: () {
-                                    setState(() {
-                                      isEditing = !isEditing;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                            drawer: Drawer(
-                              elevation: 0.0,
-                              child: ListView(
-                                children: [
-                                  UserAccountsDrawerHeader(
-                                    accountName:
-                                        Text(userTableDataFromFirebase.name),
-                                    accountEmail:
-                                        Text(authState.userModel.email),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            bottomNavigationBar: BottomAppBar(
-                              color: Theme.of(context).primaryColor,
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.add_circle_outline,
-                                  size: 37,
-                                  color: Theme.of(context).backgroundColor,
-                                ),
-                                onPressed: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => AddLinkGroupPage(
-                                        snapshot: snapshot.data,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            body: types == []
-                                ? Center(
-                                    child: Text('No data!'),
-                                  )
-                                : ListView.builder(
-                                    itemCount: types.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      return LinkGroupView(
-                                        links: sortedLinks[index],
-                                        type: types[index],
-                                        snapshot: snapshot.data,
-                                        isEditing: isEditing,
-                                      );
-                                    },
-                                  ),
-                          );
-                        } else
-                          return Center(
-                            child: Text('No data!'),
-                          );
-                      } else if (snapshot.hasError)
-                        return Container();
-                      else
-                        return LoadingPage();
-                    },
-                    initialData: null,
-                  ),
-                );
-            } else
-              return Scaffold(
-                body: Center(
-                  child: Column(
-                    children: <Widget>[
-                      Text('How did you get there?!'),
-                      RaisedButton(
-                        child: Text('Back'),
-                        onPressed: () {
-                          Navigator.of(context).pushNamed('/sign-in');
-                        },
-                      ),
-                    ],
+          if (state is Entered) {
+            if (state.msg != null) {
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Theme.of(context).errorColor,
+                  content: Text(
+                    state.msg,
                   ),
                 ),
               );
+            }
+          }
+        },
+        child: BlocListener<UserTableBloc, UserTableState>(
+          listener: (BuildContext context, UserTableState state) {
+            if (state is UserDataLoaded) {
+              if (state.stream != null)
+                setState(() {
+                  stream = state.stream;
+                });
+            }
           },
+          child: BlocBuilder<UserTableBloc, UserTableState>(
+            builder: (context, state) {
+              final authState =
+                  BlocProvider.of<AuthenticationBloc>(context).state;
+
+              if (authState is Entered) {
+                if (stream == null)
+                  return Scaffold(
+                    appBar: AppBar(),
+                    body: LoadingPage(),
+                  );
+                else
+                  return Scaffold(
+                    body: StreamBuilder(
+                      stream: stream,
+                      builder:
+                          (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                        if (snapshot.hasData) {
+                          final userTableDataFromFirebase =
+                              UserDataModel.fromJson(snapshot.data.data);
+
+                          if ((userTableDataFromFirebase != null &&
+                              userTableDataFromFirebase.table != null)) {
+                            final List<LinkTypeModel> types =
+                                userTableDataFromFirebase.table.types;
+
+                            final List<LinkModel> links =
+                                userTableDataFromFirebase.table.links;
+
+                            List<List<LinkModel>> sortedLinks = [];
+
+                            for (int i = 0; i < types.length; i++) {
+                              sortedLinks.add([]);
+                            }
+
+                            for (int i = 0; i < links.length; i++) {
+                              for (int j = 0; j < types.length; j++) {
+                                if (links[i].type == types[j].name) {
+                                  sortedLinks[j].add(links[i]);
+                                }
+                              }
+                            }
+
+                            return Scaffold(
+                              appBar: AppBar(
+                                title: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Container(
+                                      width: 40,
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey,
+                                        borderRadius: BorderRadius.circular(25),
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.person,
+                                      size: 30,
+                                    ),
+                                  ],
+                                ),
+                                actions: <Widget>[
+                                  Center(
+                                    child: Text(
+                                      isEditing ? 'Complete' : 'Edit',
+                                      style: AppBarTheme.of(context)
+                                          .textTheme
+                                          .subtitle1,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(
+                                        isEditing ? Icons.check : Icons.edit),
+                                    onPressed: () {
+                                      setState(() {
+                                        isEditing = !isEditing;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                              drawer: Drawer(
+                                elevation: 0.0,
+                                child: ListView(
+                                  children: [
+                                    UserAccountsDrawerHeader(
+                                      accountName:
+                                          Text(userTableDataFromFirebase.name),
+                                      accountEmail:
+                                          Text(authState.userModel.email),
+                                    ),
+                                    RaisedButton(
+                                      onPressed: () {
+                                        final authState =
+                                            BlocProvider.of<AuthenticationBloc>(
+                                                    context)
+                                                .state;
+
+                                        if (authState is Entered)
+                                          BlocProvider.of<AuthenticationBloc>(
+                                                  context)
+                                              .add(SignOutEvent(
+                                                  authState.userModel));
+                                      },
+                                      child: Text(
+                                        'Sign out',
+                                        style:
+                                            Theme.of(context).textTheme.button,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              bottomNavigationBar: BottomAppBar(
+                                color: Theme.of(context).primaryColor,
+                                child: IconButton(
+                                  icon: Icon(
+                                    Icons.add_circle_outline,
+                                    size: 37,
+                                    color: Theme.of(context).backgroundColor,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => AddLinkGroupPage(
+                                          snapshot: snapshot.data,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              body: types == []
+                                  ? Center(
+                                      child: Text('No data!'),
+                                    )
+                                  : ListView.builder(
+                                      itemCount: types.length,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        return LinkGroupView(
+                                          links: sortedLinks[index],
+                                          type: types[index],
+                                          snapshot: snapshot.data,
+                                          isEditing: isEditing,
+                                        );
+                                      },
+                                    ),
+                            );
+                          } else
+                            return Center(
+                              child: Text('No data!'),
+                            );
+                        } else if (snapshot.hasError)
+                          return Container();
+                        else
+                          return LoadingPage();
+                      },
+                      initialData: null,
+                    ),
+                  );
+              } else
+                return Scaffold(
+                  body: Center(
+                    child: Column(
+                      children: <Widget>[
+                        Text('How did you get there?!'),
+                        RaisedButton(
+                          child: Text('Back'),
+                          onPressed: () {
+                            Navigator.of(context).pushNamed('/sign-in');
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+            },
+          ),
         ),
       ),
     );

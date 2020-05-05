@@ -146,9 +146,13 @@ class _MyAppState extends State<MyApp> {
                 } else
                   return Scaffold(
                     body: Center(
-                      child: FlareActor(
-                        'assets/flare_animations/intro.flr',
-                        animation: 'Untitled',
+                      child: Container(
+                        width: 300,
+                        height: 300,
+                        child: FlareActor(
+                          'assets/flare_animations/intro.flr',
+                          animation: 'Untitled',
+                        ),
                       ),
                     ),
                   );

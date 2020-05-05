@@ -10,13 +10,16 @@ import './bloc.dart';
 
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
-  final Register register;
+  final Register _register;
 
-  final SignIn signIn;
+  final SignIn _signIn;
 
-  final SignInAuto signInAuto;
+  final SignInAuto _signInAuto;
 
-  AuthenticationBloc(this.register, this.signInAuto, this.signIn);
+  final SignOut _signOut;
+
+  AuthenticationBloc(
+      this._register, this._signInAuto, this._signIn, this._signOut);
 
   @override
   AuthenticationState get initialState => InitialAuthenticationState();
@@ -36,7 +39,7 @@ class AuthenticationBloc
       final email = event.email.replaceAll(spaces, '');
       final password = event.password.replaceAll(spaces, '');
 
-      final result = await signIn(
+      final result = await _signIn(
         AuthenticationParams(
           password: password,
           email: email,
@@ -56,7 +59,7 @@ class AuthenticationBloc
 
       if (emailRegExp.hasMatch(email)) {
         if (password.length > 6) {
-          final result = await register(
+          final result = await _register(
             AuthenticationParams(password: password, email: email, name: name),
           );
 
@@ -72,12 +75,21 @@ class AuthenticationBloc
         yield FailureAuthenticationState('Email isn\'t valid!');
     }
     if (event is AutoSignIn) {
-      final result = await signInAuto(NoParams());
+      final result = await _signInAuto(NoParams());
 
       yield result.fold((failure) {
         return FailureAuthenticationState(failure.error);
       }, (user) {
         return Entered(user);
+      });
+    }
+    if (event is SignOutEvent) {
+      final result = await _signOut(NoParams());
+
+      yield result.fold((failure) {
+        return Entered(event.prevUser, msg: failure.error);
+      }, (user) {
+        return SignedOut();
       });
     }
   }

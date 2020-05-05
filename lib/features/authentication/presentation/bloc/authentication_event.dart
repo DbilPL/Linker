@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:linker/features/authentication/data/model/user_model.dart';
 
 abstract class AuthenticationEvent extends Equatable {
   List<Object> get props => [];
@@ -24,3 +25,9 @@ class SignInEvent extends AuthenticationEvent {
 }
 
 class AutoSignIn extends AuthenticationEvent {}
+
+class SignOutEvent extends AuthenticationEvent {
+  final UserModel prevUser;
+
+  SignOutEvent(this.prevUser);
+}
