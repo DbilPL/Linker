@@ -6,6 +6,7 @@ import 'package:linker/core/errors/exceptions.dart';
 import 'package:linker/core/errors/failure.dart';
 import 'package:linker/features/authentication/data/model/user_model.dart';
 import 'package:linker/features/authentication/domain/entities/user.dart';
+import 'package:linker/features/table/data/model/user_link_table_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class AuthenticationDataSource {
@@ -48,9 +49,11 @@ class AuthenticationDataSourceImpl extends AuthenticationDataSource {
 
       await collection.document(user.uid).setData({
         'groups': [],
-        'links': [],
         'name': name,
-        'types': [],
+        'user_link_table': UserLinkTableModel(
+          links: [],
+          types: [],
+        ).toJson(),
       });
 
       final newUser = UserModel(

@@ -14,8 +14,7 @@ class UserDataModel extends UserData {
   static UserDataModel fromJson(Map<String, dynamic> json) {
     return UserDataModel(
       name: json['name'],
-      groupNameList:
-          json['group_names'].map<String>((v) => v.toString()).toList(),
+      groupNameList: json['groups'].map<String>((v) => v.toString()).toList(),
       table: UserLinkTableModel.fromJson(json['user_link_table']),
     );
   }
@@ -23,7 +22,7 @@ class UserDataModel extends UserData {
   Map<String, dynamic> toJson() {
     return {
       'name': this.name,
-      'group_names': this.groupNameList,
+      'groups': this.groupNameList,
       'user_link_table': this.table.toJson(),
     };
   }

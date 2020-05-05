@@ -64,8 +64,7 @@ class _UserPageState extends State<UserPage> {
                             UserDataModel.fromJson(snapshot.data.data);
 
                         if ((userTableDataFromFirebase != null &&
-                                userTableDataFromFirebase.table != null) &&
-                            userTableDataFromFirebase.table.types != []) {
+                            userTableDataFromFirebase.table != null)) {
                           final List<LinkTypeModel> types =
                               userTableDataFromFirebase.table.types;
 
@@ -157,17 +156,22 @@ class _UserPageState extends State<UserPage> {
                                 },
                               ),
                             ),
-                            body: ListView.builder(
-                              itemCount: types.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                return LinkGroupView(
-                                  links: sortedLinks[index],
-                                  type: types[index],
-                                  snapshot: snapshot.data,
-                                  isEditing: isEditing,
-                                );
-                              },
-                            ),
+                            body: types == []
+                                ? Center(
+                                    child: Text('No data!'),
+                                  )
+                                : ListView.builder(
+                                    itemCount: types.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return LinkGroupView(
+                                        links: sortedLinks[index],
+                                        type: types[index],
+                                        snapshot: snapshot.data,
+                                        isEditing: isEditing,
+                                      );
+                                    },
+                                  ),
                           );
                         } else
                           return Center(

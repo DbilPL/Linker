@@ -10,16 +10,13 @@ class UserLinkTableModel extends Equatable {
   UserLinkTableModel({this.links, this.types});
 
   static UserLinkTableModel fromJson(Map<String, dynamic> json) {
-    return json != null
-        ? UserLinkTableModel(
-            links: json['links']
-                .map<LinkModel>((v) => LinkModel.fromJson(v))
-                .toList(),
-            types: json['types']
-                .map<LinkTypeModel>((v) => LinkTypeModel.fromJson(v))
-                .toList(),
-          )
-        : null;
+    return UserLinkTableModel(
+      links:
+          json['links'].map<LinkModel>((v) => LinkModel.fromJson(v)).toList(),
+      types: json['types']
+          .map<LinkTypeModel>((v) => LinkTypeModel.fromJson(v))
+          .toList(),
+    );
   }
 
   Map<String, dynamic> toJson() {
