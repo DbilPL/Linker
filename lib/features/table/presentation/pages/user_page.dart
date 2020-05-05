@@ -151,6 +151,27 @@ class _UserPageState extends State<UserPage> {
                                           Text(userTableDataFromFirebase.name),
                                       accountEmail:
                                           Text(authState.userModel.email),
+                                      currentAccountPicture: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Container(
+                                            width: 80,
+                                            height: 80,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey,
+                                              borderRadius:
+                                                  BorderRadius.circular(40),
+                                            ),
+                                          ),
+                                          Icon(
+                                            Icons.person,
+                                            size: 65,
+                                            color: AppBarTheme.of(context)
+                                                .iconTheme
+                                                .color,
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                     RaisedButton(
                                       onPressed: () {
