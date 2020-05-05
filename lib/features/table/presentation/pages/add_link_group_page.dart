@@ -78,6 +78,7 @@ class _AddLinkGroupPageState extends State<AddLinkGroupPage> {
                   ),
                   ListTile(
                     onTap: () {
+                      closeKeyBoard();
                       _openColorPicker();
                     },
                     title: Text(
@@ -135,6 +136,8 @@ class _AddLinkGroupPageState extends State<AddLinkGroupPage> {
   }
 
   void changeImportance(int i) {
+    closeKeyBoard();
+
     final newImportanceValue = importanceValue + i;
 
     if (newImportanceValue >= 0 && newImportanceValue <= 12) {
@@ -145,6 +148,8 @@ class _AddLinkGroupPageState extends State<AddLinkGroupPage> {
   }
 
   void _openDialog(String title, Widget content) {
+    closeKeyBoard();
+
     showDialog(
       context: context,
       builder: (_) {
@@ -166,6 +171,8 @@ class _AddLinkGroupPageState extends State<AddLinkGroupPage> {
   }
 
   void _openColorPicker() async {
+    closeKeyBoard();
+
     _openDialog(
       'Color picker',
       CircleColorPicker(
@@ -177,5 +184,9 @@ class _AddLinkGroupPageState extends State<AddLinkGroupPage> {
         },
       ),
     );
+  }
+
+  void closeKeyBoard() {
+    FocusScope.of(context).unfocus();
   }
 }

@@ -22,10 +22,10 @@ class UserTableRepositoryImpl extends UserTableRepository {
 
         return Right(stream);
       } catch (e) {
-        return Left(FirebaseFailure());
+        return Left(Failure(error: 'Something went wrong! Try again!'));
       }
     } else
-      return Left(ConnectionFailure());
+      return Left(Failure(error: 'No connection to internet!'));
   }
 
   @override
@@ -38,9 +38,9 @@ class UserTableRepositoryImpl extends UserTableRepository {
 
         return Right(update);
       } catch (e) {
-        return Left(FirebaseFailure());
+        return Left(Failure(error: 'Something went wrong! Try again!'));
       }
     } else
-      return Left(ConnectionFailure());
+      return Left(Failure(error: 'No connection to internet!'));
   }
 }
