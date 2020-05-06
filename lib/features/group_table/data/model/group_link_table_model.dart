@@ -20,9 +20,13 @@ class GroupLinkTableModel extends GroupLinkTable {
     return GroupLinkTableModel(
       creatorUid: json['creator_uid'],
       tableName: json['table_name'],
-      usersOfGroup: json['users_of_group'],
-      links: json['links'].map((v) => LinkModel.fromJson(v)).toList(),
-      types: json['types'].map((v) => LinkTypeModel.fromJson(v)).toList(),
+      usersOfGroup:
+          json['users_of_group'].map<String>((v) => v.toString()).toList(),
+      links:
+          json['links'].map<LinkModel>((v) => LinkModel.fromJson(v)).toList(),
+      types: json['types']
+          .map<LinkTypeModel>((v) => LinkTypeModel.fromJson(v))
+          .toList(),
     );
   }
 

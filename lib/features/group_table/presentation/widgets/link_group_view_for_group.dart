@@ -3,21 +3,21 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:linker/features/group_table/data/model/group_link_table_model.dart';
+import 'package:linker/features/group_table/presentation/bloc/group_table_bloc.dart';
+import 'package:linker/features/group_table/presentation/bloc/group_table_event.dart';
 import 'package:linker/features/group_table/presentation/pages/add_link_to_group_page.dart';
 import 'package:linker/features/table/data/model/link_model.dart';
 import 'package:linker/features/table/data/model/link_type_model.dart';
-import 'package:linker/features/table/data/model/user_data_model.dart';
-import 'package:linker/features/table/presentation/bloc/bloc.dart';
+import 'package:linker/features/table/presentation/widgets/link_view.dart';
 
-import 'link_view.dart';
-
-class LinkGroupView extends StatefulWidget {
+class LinkGroupViewForGroup extends StatefulWidget {
   final LinkTypeModel type;
   final List<LinkModel> links;
   final DocumentSnapshot snapshot;
   final bool isEditing;
 
-  LinkGroupView({
+  LinkGroupViewForGroup({
     Key key,
     this.type,
     this.links,
@@ -26,10 +26,10 @@ class LinkGroupView extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _LinkGroupViewState createState() => _LinkGroupViewState();
+  _LinkGroupViewForGroupState createState() => _LinkGroupViewForGroupState();
 }
 
-class _LinkGroupViewState extends State<LinkGroupView> {
+class _LinkGroupViewForGroupState extends State<LinkGroupViewForGroup> {
   bool isFullView = false;
 
   @override
@@ -88,13 +88,13 @@ class _LinkGroupViewState extends State<LinkGroupView> {
                       ),
                     );
                   } else {
-                    final prevUserDataModel =
-                        UserDataModel.fromJson(widget.snapshot.data);
+                    final prevGroupDataModel =
+                        GroupLinkTableModel.fromJson(widget.snapshot.data);
 
-                    BlocProvider.of<UserTableBloc>(context).add(
-                      DeleteLinkType(
+                    BlocProvider.of<GroupTableBloc>(context).add(
+                      DeleteLinkTypeGroup(
                         widget.type,
-                        prevUserDataModel,
+                        prevGroupDataModel,
                         widget.snapshot.reference,
                       ),
                     );
@@ -115,13 +115,14 @@ class _LinkGroupViewState extends State<LinkGroupView> {
                               color: Colors.redAccent,
                             ),
                             onDismissed: (direction) {
-                              final prevUserDataModel =
-                                  UserDataModel.fromJson(widget.snapshot.data);
+                              final prevGroupDataModel =
+                                  GroupLinkTableModel.fromJson(
+                                      widget.snapshot.data);
 
-                              BlocProvider.of<UserTableBloc>(context).add(
-                                DeleteLink(
+                              BlocProvider.of<GroupTableBloc>(context).add(
+                                DeleteLinkGroup(
                                   widget.links[index],
-                                  prevUserDataModel,
+                                  prevGroupDataModel,
                                   widget.snapshot.reference,
                                 ),
                               );

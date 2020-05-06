@@ -21,5 +21,5 @@ class UpdateGroupTableDataParams {
   final DocumentReference reference;
   final GroupLinkTable newTable;
 
-  UpdateGroupTableDataParams(this.reference, this.newTable);
+  UpdateGroupTableDataParams({this.reference, this.newTable});
 }

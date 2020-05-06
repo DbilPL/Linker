@@ -73,6 +73,6 @@ Future<void> init() async {
   sl.registerSingleton(CreateNewGroup(sl<GroupTableRepositoryImpl>()));
   sl.registerSingleton(DynamicLinkStream(sl<GroupTableRepositoryImpl>()));
   sl.registerSingleton(DynamicLinkBloc(sl<DynamicLinkStream>()));
-  sl.registerSingleton(
-      GroupTableBloc(sl<GetGroupTableStream>(), sl<CreateNewGroup>()));
+  sl.registerSingleton(GroupTableBloc(sl<GetGroupTableStream>(),
+      sl<CreateNewGroup>(), sl<UpdateGroupTableData>()));
 }
