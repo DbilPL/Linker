@@ -12,3 +12,12 @@ class LoadGroupSnapshots extends GroupTableEvent {
   @override
   List<Object> get props => [groupName];
 }
+
+class AddNewGroup extends GroupTableEvent {
+  final String groupName, uid, userName;
+
+  AddNewGroup(this.groupName, this.uid, this.userName);
+
+  @override
+  List<Object> get props => [groupName, uid, userName];
+}

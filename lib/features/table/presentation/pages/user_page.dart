@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:linker/core/presentation/pages/loading_page.dart';
 import 'package:linker/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:linker/features/authentication/presentation/bloc/bloc.dart';
+import 'package:linker/features/group_table/presentation/pages/groups_list.dart';
 import 'package:linker/features/table/data/model/link_model.dart';
 import 'package:linker/features/table/data/model/link_type_model.dart';
 import 'package:linker/features/table/data/model/user_data_model.dart';
@@ -173,8 +174,8 @@ class _UserPageState extends State<UserPage> {
                                         ],
                                       ),
                                     ),
-                                    RaisedButton(
-                                      onPressed: () {
+                                    ListTile(
+                                      onTap: () {
                                         final authState =
                                             BlocProvider.of<AuthenticationBloc>(
                                                     context)
@@ -183,13 +184,28 @@ class _UserPageState extends State<UserPage> {
                                         if (authState is Entered)
                                           BlocProvider.of<AuthenticationBloc>(
                                                   context)
-                                              .add(SignOutEvent(
-                                                  authState.userModel));
+                                              .add(
+                                            SignOutEvent(
+                                              authState.userModel,
+                                            ),
+                                          );
                                       },
-                                      child: Text(
+                                      title: Text(
                                         'Sign out',
-                                        style:
-                                            Theme.of(context).textTheme.button,
+                                      ),
+                                    ),
+                                    ListTile(
+                                      onTap: () {
+                                        Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                            builder: (context) => GroupsList(
+                                              snapshot: snapshot,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      title: Text(
+                                        'Groups',
                                       ),
                                     ),
                                   ],
@@ -252,7 +268,8 @@ class _UserPageState extends State<UserPage> {
                         RaisedButton(
                           child: Text('Back'),
                           onPressed: () {
-                            Navigator.of(context).pushNamed('/sign-in');
+                            Navigator.of(context)
+                                .pushReplacementNamed('/sign-in');
                           },
                         ),
                       ],

@@ -13,6 +13,7 @@ import 'package:linker/features/authentication/domain/usecases/sign_out.dart';
 import 'package:linker/features/authentication/presentation/bloc/bloc.dart';
 import 'package:linker/features/group_table/data/datasources/group_table_data_source.dart';
 import 'package:linker/features/group_table/data/respositories/group_table_repository_impl.dart';
+import 'package:linker/features/group_table/domain/usecases/create_new_group.dart';
 import 'package:linker/features/group_table/domain/usecases/dynamic_link_stream.dart';
 import 'package:linker/features/group_table/domain/usecases/generate_joining_link.dart';
 import 'package:linker/features/group_table/domain/usecases/get_group_table_stream.dart';
@@ -69,7 +70,9 @@ Future<void> init() async {
   sl.registerSingleton(GetGroupTableStream(sl<GroupTableRepositoryImpl>()));
   sl.registerSingleton(UpdateGroupTableData(sl<GroupTableRepositoryImpl>()));
   sl.registerSingleton(GenerateJoiningLink(sl<GroupTableRepositoryImpl>()));
+  sl.registerSingleton(CreateNewGroup(sl<GroupTableRepositoryImpl>()));
   sl.registerSingleton(DynamicLinkStream(sl<GroupTableRepositoryImpl>()));
   sl.registerSingleton(DynamicLinkBloc(sl<DynamicLinkStream>()));
-  sl.registerSingleton(GroupTableBloc(sl<GetGroupTableStream>()));
+  sl.registerSingleton(
+      GroupTableBloc(sl<GetGroupTableStream>(), sl<CreateNewGroup>()));
 }

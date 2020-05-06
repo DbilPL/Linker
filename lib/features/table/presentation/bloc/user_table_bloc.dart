@@ -244,5 +244,28 @@ class UserTableBloc extends Bloc<UserTableEvent, UserTableState> {
         (success) => UserDataLoaded(null),
       );
     }
+    if (event is AddNewGroupToUserData) {
+      final newUserDataModel = UserDataModel(
+        groupNameList: event.prevUserDataModel.groupNameList
+          ..add(event.groupName),
+        name: event.prevUserDataModel.name,
+        table: UserLinkTableModel(
+          links: event.prevUserDataModel.table.links,
+          types: event.prevUserDataModel.table.types,
+        ),
+      );
+
+      final result = await _updateUserData(
+        UpdateUserDataParams(
+          newUserData: newUserDataModel,
+          reference: event.reference,
+        ),
+      );
+
+      yield result.fold(
+        (failure) => FailureUserTableState(failure.error),
+        (success) => UserDataLoaded(null),
+      );
+    }
   }
 }

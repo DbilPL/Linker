@@ -17,6 +17,17 @@ class LoadUserDataInitial extends UserTableEvent {
   List<Object> get props => [uid];
 }
 
+class AddNewGroupToUserData extends UserTableEvent {
+  final String groupName;
+  final UserDataModel prevUserDataModel;
+  final DocumentReference reference;
+
+  AddNewGroupToUserData(this.groupName, this.prevUserDataModel, this.reference);
+
+  @override
+  List<Object> get props => [groupName, prevUserDataModel, reference];
+}
+
 class AddNewLinkTypeEvent extends UserTableEvent {
   final LinkTypeModel type;
   final UserDataModel prevUserDataModel;

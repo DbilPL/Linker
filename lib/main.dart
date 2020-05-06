@@ -2,6 +2,7 @@ import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:linker/features/group_table/presentation/bloc/bloc.dart';
+import 'package:linker/features/group_table/presentation/pages/groups_list.dart';
 import 'package:linker/features/table/presentation/bloc/bloc.dart';
 import 'package:linker/injection_container.dart';
 
@@ -92,6 +93,7 @@ class _MyAppState extends State<MyApp> {
         '/sign-up': (context) => SignUpPage(),
         '/sign-in': (context) => SignInPage(),
         '/user': (context) => UserPage(),
+        '/groups-list': (context) => GroupsList(),
       },
       home: BlocListener<AuthenticationBloc, AuthenticationState>(
         listener: (context, state) async {
