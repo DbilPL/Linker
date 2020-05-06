@@ -122,7 +122,13 @@ class _MyAppState extends State<MyApp> {
                   BlocProvider.of<UserTableBloc>(context).state;
 
               if (authState is Entered && userTableState is UserDataLoaded) {
-                // TODO: change adding group to user
+                final navigator = Navigator.of(context);
+
+                if (navigator.canPop()) {
+                  navigator.pop();
+                }
+
+                navigator.pushReplacementNamed('/group-table-page');
               }
             }
           },
