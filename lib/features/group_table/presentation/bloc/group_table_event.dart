@@ -70,3 +70,12 @@ class DeleteLinkGroup extends GroupTableEvent {
   @override
   List<Object> get props => [link, prevUserDataModel, reference];
 }
+
+class GenerateJoiningLinkEvent extends GroupTableEvent {
+  final String groupName;
+
+  GenerateJoiningLinkEvent(this.groupName);
+
+  @override
+  List<Object> get props => [];
+}

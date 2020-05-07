@@ -3,20 +3,23 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:linker/features/group_table/data/model/group_link_table_model.dart';
 import 'package:linker/features/group_table/domain/usecases/create_new_group.dart';
+import 'package:linker/features/group_table/domain/usecases/generate_joining_link.dart';
 import 'package:linker/features/group_table/domain/usecases/get_group_table_stream.dart';
 import 'package:linker/features/group_table/domain/usecases/update_group_table_data.dart';
 import 'package:linker/features/table/data/model/link_model.dart';
 import 'package:linker/features/table/data/model/link_type_model.dart';
+import 'package:validators/validators.dart';
 
 import './bloc.dart';
 
 class GroupTableBloc extends Bloc<GroupTableEvent, GroupTableState> {
-  final GetGroupTableStream getGroupTableStream;
-  final CreateNewGroup createNewGroup;
+  final GetGroupTableStream _getGroupTableStream;
+  final CreateNewGroup _createNewGroup;
   final UpdateGroupTableData _updateGroupTableData;
+  final GenerateJoiningLink _generateJoiningLink;
 
-  GroupTableBloc(this.getGroupTableStream, this.createNewGroup,
-      this._updateGroupTableData);
+  GroupTableBloc(this._getGroupTableStream, this._createNewGroup,
+      this._updateGroupTableData, this._generateJoiningLink);
 
   @override
   GroupTableState get initialState => InitialGroupTableState();
@@ -28,17 +31,17 @@ class GroupTableBloc extends Bloc<GroupTableEvent, GroupTableState> {
     yield LoadingGroupTableState();
 
     if (event is LoadGroupSnapshots) {
-      final result = await getGroupTableStream(event.groupName);
+      final result = await _getGroupTableStream(event.groupName);
 
       yield await result.fold((failure) {
         return FailureGroupTableState(failure.error);
       }, (success) {
-        return SnapshotsLoaded(success, event.groupName);
+        return SnapshotsLoaded(success);
       });
     }
 
     if (event is AddNewGroup) {
-      final result = await createNewGroup(
+      final result = await _createNewGroup(
         CreateNewGroupParams(
           uid: event.uid,
           groupName: event.groupName,
@@ -49,7 +52,7 @@ class GroupTableBloc extends Bloc<GroupTableEvent, GroupTableState> {
       yield await result.fold((failure) {
         return FailureGroupTableState(failure.error);
       }, (success) {
-        return SnapshotsLoaded(success, event.groupName);
+        return SnapshotsLoaded(success);
       });
     }
     if (event is AddNewLinkTypeForGroupEvent) {
@@ -75,7 +78,7 @@ class GroupTableBloc extends Bloc<GroupTableEvent, GroupTableState> {
 
           yield result.fold(
             (failure) => FailureGroupTableState(failure.error),
-            (success) => SnapshotsLoaded(null, null),
+            (success) => SnapshotsLoaded(null),
           );
         } else {
           List<LinkTypeModel> types = List.from(event.prevUserDataModel.types);
@@ -129,7 +132,7 @@ class GroupTableBloc extends Bloc<GroupTableEvent, GroupTableState> {
 
               yield result.fold(
                 (failure) => FailureGroupTableState(failure.error),
-                (success) => SnapshotsLoaded(null, null),
+                (success) => SnapshotsLoaded(null),
               );
             } else {
               yield FailureGroupTableState('This link group already exist!');
@@ -156,7 +159,7 @@ class GroupTableBloc extends Bloc<GroupTableEvent, GroupTableState> {
 
             yield result.fold(
               (failure) => FailureGroupTableState(failure.error),
-              (success) => SnapshotsLoaded(null, null),
+              (success) => SnapshotsLoaded(null),
             );
           }
         }
@@ -166,30 +169,33 @@ class GroupTableBloc extends Bloc<GroupTableEvent, GroupTableState> {
     if (event is AddNewLinkToGroup) {
       yield LoadingGroupTableState();
       if (event.link.title != '' && event.link.link != '') {
-        final newGroupData = GroupLinkTableModel(
-          usersOfGroup: event.prevUserDataModel.usersOfGroup,
-          types: event.prevUserDataModel.types,
-          links: event.prevUserDataModel.links..add(event.link),
-          creatorUid: event.prevUserDataModel.creatorUid,
-          tableName: event.prevUserDataModel.tableName,
-        );
+        if (isURL(event.link.link, requireTld: true, requireProtocol: true)) {
+          final newGroupData = GroupLinkTableModel(
+            usersOfGroup: event.prevUserDataModel.usersOfGroup,
+            types: event.prevUserDataModel.types,
+            links: event.prevUserDataModel.links..add(event.link),
+            creatorUid: event.prevUserDataModel.creatorUid,
+            tableName: event.prevUserDataModel.tableName,
+          );
 
-        final result = await _updateGroupTableData(
-          UpdateGroupTableDataParams(
-            newTable: newGroupData,
-            reference: event.reference,
-          ),
-        );
+          final result = await _updateGroupTableData(
+            UpdateGroupTableDataParams(
+              newTable: newGroupData,
+              reference: event.reference,
+            ),
+          );
 
-        yield result.fold(
-          (failure) {
-            return FailureGroupTableState(failure.error);
-          },
-          (success) {
-            print('success');
-            return SnapshotsLoaded(null, null);
-          },
-        );
+          yield result.fold(
+            (failure) {
+              return FailureGroupTableState(failure.error);
+            },
+            (success) {
+              print('success');
+              return SnapshotsLoaded(null);
+            },
+          );
+        } else
+          yield FailureGroupTableState('Write valid link!');
       } else
         yield FailureGroupTableState('Write non-null title or link!');
     }
@@ -221,7 +227,7 @@ class GroupTableBloc extends Bloc<GroupTableEvent, GroupTableState> {
 
       yield result.fold(
         (failure) => FailureGroupTableState(failure.error),
-        (success) => SnapshotsLoaded(null, null),
+        (success) => SnapshotsLoaded(null),
       );
     }
     if (event is DeleteLinkGroup) {
@@ -246,7 +252,16 @@ class GroupTableBloc extends Bloc<GroupTableEvent, GroupTableState> {
 
       yield result.fold(
         (failure) => FailureGroupTableState(failure.error),
-        (success) => SnapshotsLoaded(null, null),
+        (success) => SnapshotsLoaded(null),
+      );
+    }
+
+    if (event is GenerateJoiningLinkEvent) {
+      final result = await _generateJoiningLink(event.groupName);
+
+      yield result.fold(
+        (failure) => FailureGroupTableState(failure.error),
+        (success) => SnapshotsLoaded(null, joiningLink: success),
       );
     }
   }

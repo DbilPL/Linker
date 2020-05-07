@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:linker/features/group_table/presentation/bloc/bloc.dart';
+import 'package:linker/features/group_table/presentation/pages/group_table_page.dart';
 import 'package:linker/features/table/data/model/user_data_model.dart';
 import 'package:linker/features/table/presentation/bloc/user_table_bloc.dart';
 import 'package:linker/features/table/presentation/bloc/user_table_event.dart';
@@ -29,7 +30,13 @@ class _AddGroupState extends State<AddGroup> {
           listener: (context, state) {
             if (state is SnapshotsLoaded) {
               Navigator.of(context).pop();
-              Navigator.of(context).pushReplacementNamed('/group-table-page');
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => GroupTablePage(
+                    snapshot: widget.snapshot,
+                  ),
+                ),
+              );
             }
             if (state is FailureGroupTableState) {
               Scaffold.of(context).showSnackBar(

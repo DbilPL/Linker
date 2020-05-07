@@ -27,10 +27,9 @@ class LoadingGroupTableState extends GroupTableState {
 }
 
 class SnapshotsLoaded extends GroupTableState {
-  final String groupName;
   final Stream<DocumentSnapshot> stream;
-
-  SnapshotsLoaded(this.stream, this.groupName);
+  final String joiningLink;
+  SnapshotsLoaded(this.stream, {this.joiningLink});
 
   @override
   List<Object> get props => [stream];

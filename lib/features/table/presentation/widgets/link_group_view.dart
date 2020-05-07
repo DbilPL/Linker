@@ -3,11 +3,11 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:linker/features/group_table/presentation/pages/add_link_to_group_page.dart';
 import 'package:linker/features/table/data/model/link_model.dart';
 import 'package:linker/features/table/data/model/link_type_model.dart';
 import 'package:linker/features/table/data/model/user_data_model.dart';
 import 'package:linker/features/table/presentation/bloc/bloc.dart';
+import 'package:linker/features/table/presentation/pages/add_link_page.dart';
 
 import 'link_view.dart';
 
@@ -81,7 +81,7 @@ class _LinkGroupViewState extends State<LinkGroupView> {
                   if (!widget.isEditing) {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => AddLinkToGroupPage(
+                        builder: (context) => AddLinkPage(
                           snapshot: widget.snapshot,
                           type: widget.type,
                         ),

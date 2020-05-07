@@ -7,6 +7,7 @@ import 'package:linker/features/table/data/model/user_data_model.dart';
 import 'package:linker/features/table/data/model/user_link_table_model.dart';
 import 'package:linker/features/table/domain/usecases/get_user_data_stream.dart';
 import 'package:linker/features/table/domain/usecases/update_user_data.dart';
+import 'package:validators/validators.dart';
 
 import './bloc.dart';
 
@@ -35,34 +36,37 @@ class UserTableBloc extends Bloc<UserTableEvent, UserTableState> {
     if (event is AddNewLink) {
       yield LoadingUserTableState();
       if (event.link.title != '' && event.link.link != '') {
-        final newUserDataModel = UserDataModel(
-          name: event.prevUserDataModel.name,
-          groupNameList: event.prevUserDataModel.groupNameList,
-          table: UserLinkTableModel(
-            types: event.prevUserDataModel.table.types,
-            links: event.prevUserDataModel.table.links
-              ..add(
-                event.link,
-              ),
-          ),
-        );
+        if (isURL(event.link.link, requireProtocol: true, requireTld: true)) {
+          final newUserDataModel = UserDataModel(
+            name: event.prevUserDataModel.name,
+            groupNameList: event.prevUserDataModel.groupNameList,
+            table: UserLinkTableModel(
+              types: event.prevUserDataModel.table.types,
+              links: event.prevUserDataModel.table.links
+                ..add(
+                  event.link,
+                ),
+            ),
+          );
 
-        final result = await _updateUserData(
-          UpdateUserDataParams(
-            newUserData: newUserDataModel,
-            reference: event.reference,
-          ),
-        );
+          final result = await _updateUserData(
+            UpdateUserDataParams(
+              newUserData: newUserDataModel,
+              reference: event.reference,
+            ),
+          );
 
-        yield result.fold(
-          (failure) {
-            return FailureUserTableState(failure.error);
-          },
-          (success) {
-            print('success');
-            return UserDataLoaded(null);
-          },
-        );
+          yield result.fold(
+            (failure) {
+              return FailureUserTableState(failure.error);
+            },
+            (success) {
+              print('success');
+              return UserDataLoaded(null);
+            },
+          );
+        } else
+          yield FailureUserTableState('Write valid link!');
       } else
         yield FailureUserTableState('Write non-null title or link!');
     }

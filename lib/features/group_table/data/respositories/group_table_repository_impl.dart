@@ -37,9 +37,9 @@ class GroupTableRepositoryImpl extends GroupTableRepository {
 
         return Right(stream);
       } else
-        return Left(ConnectionFailure());
+        return Left(Failure(error: 'Has no connection to internet!'));
     } catch (e) {
-      return Left(FirebaseFailure());
+      return Left(Failure(error: 'Something went wrong!'));
     }
   }
 
@@ -53,9 +53,9 @@ class GroupTableRepositoryImpl extends GroupTableRepository {
 
         return Right(success);
       } else
-        return Left(ConnectionFailure());
+        return Left(Failure(error: 'Has no connection to internet!'));
     } catch (e) {
-      return Left(FirebaseFailure());
+      return Left(Failure(error: 'Something went wrong!'));
     }
   }
 
@@ -69,23 +69,23 @@ class GroupTableRepositoryImpl extends GroupTableRepository {
 
         return Right(stream);
       } else
-        return Left(ConnectionFailure());
+        return Left(Failure(error: 'Has no connection to internet!'));
     } catch (e) {
-      return Left(FirebaseFailure());
+      return Left(Failure(error: 'Something went wrong!'));
     }
   }
 
   @override
-  Future<Either<Failure, Stream<Uri>>> dynamicLinkStream() async {
+  Future<Either<Failure, Uri>> retrieveDynamicLink(Function onSuccess) async {
     try {
       if (await connectionChecker.hasConnection) {
-        final stream = dataSource.dynamicLinkStream();
+        final link = await dataSource.retrieveDynamicLink(onSuccess);
 
-        return Right(stream);
+        return Right(link);
       } else
-        return Left(ConnectionFailure());
+        return Left(Failure(error: 'Has no connection to internet!'));
     } catch (e) {
-      return Left(FirebaseFailure());
+      return Left(Failure(error: 'Something went wrong!'));
     }
   }
 }

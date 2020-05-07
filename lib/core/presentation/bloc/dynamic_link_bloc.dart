@@ -1,15 +1,14 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:linker/features/authentication/domain/usecases/sign_out.dart';
-import 'package:linker/features/group_table/domain/usecases/dynamic_link_stream.dart';
+import 'package:linker/features/group_table/domain/usecases/retrieve_dynamic_link.dart';
 
 import './bloc.dart';
 
 class DynamicLinkBloc extends Bloc<DynamicLinkEvent, DynamicLinkState> {
-  final DynamicLinkStream linkStream;
+  final RetrieveDynamicLink initialLink;
 
-  DynamicLinkBloc(this.linkStream);
+  DynamicLinkBloc(this.initialLink);
 
   @override
   DynamicLinkState get initialState => InitialDynamicLinkState();
@@ -18,10 +17,8 @@ class DynamicLinkBloc extends Bloc<DynamicLinkEvent, DynamicLinkState> {
   Stream<DynamicLinkState> mapEventToState(
     DynamicLinkEvent event,
   ) async* {
-    if (event is LoadOnLinkHandler) {
-      await Future.delayed(Duration(seconds: 4));
-
-      final loadLink = await linkStream(NoParams());
+    if (event is LoadInitialLink) {
+      final loadLink = await initialLink(event.function);
 
       yield loadLink.fold((failure) {
         return FailureLinkState(failure);

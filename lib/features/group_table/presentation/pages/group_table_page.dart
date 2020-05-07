@@ -11,6 +11,7 @@ import 'package:linker/features/table/data/model/link_model.dart';
 import 'package:linker/features/table/data/model/link_type_model.dart';
 import 'package:linker/features/table/data/model/user_data_model.dart';
 import 'package:linker/features/table/presentation/bloc/bloc.dart';
+import 'package:share/share.dart';
 
 import 'file:///D:/Main/MainProjects/linker/lib/features/group_table/presentation/pages/add_link_group_for_group.dart';
 
@@ -37,6 +38,8 @@ class _GroupTablePageState extends State<GroupTablePage> {
               setState(() {
                 groupStream = state.stream;
               });
+
+            if (state.joiningLink != null) Share.share(state.joiningLink);
           }
           if (state is FailureGroupTableState) {
             Scaffold.of(context).showSnackBar(
@@ -180,6 +183,18 @@ class _GroupTablePageState extends State<GroupTablePage> {
                                     },
                                     title: Text(
                                       'Back to user page',
+                                    ),
+                                  ),
+                                  ListTile(
+                                    onTap: () {
+                                      BlocProvider.of<GroupTableBloc>(context)
+                                          .add(
+                                        GenerateJoiningLinkEvent(
+                                            groupDataModel.tableName),
+                                      );
+                                    },
+                                    title: Text(
+                                      'Share joining link',
                                     ),
                                   ),
                                 ],

@@ -1,7 +1,11 @@
+import 'dart:async';
+
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:linker/features/group_table/presentation/bloc/bloc.dart';
+import 'package:linker/features/group_table/presentation/pages/group_table_page.dart';
 import 'package:linker/features/group_table/presentation/pages/groups_list.dart';
 import 'package:linker/features/table/presentation/bloc/bloc.dart';
 import 'package:linker/injection_container.dart';
@@ -31,8 +35,37 @@ void main() async {
           create: (context) => sl<AuthenticationBloc>()..add(AutoSignIn()),
         ),
         BlocProvider<DynamicLinkBloc>(
-          create: (context) =>
-              sl<DynamicLinkBloc>()..add(LoadOnLinkHandler()), // Link Bloc
+          create: (context) => sl<DynamicLinkBloc>()
+            ..add(LoadInitialLink((event) async {
+              if (event is PendingDynamicLinkData) {
+                final authState =
+                    BlocProvider.of<AuthenticationBloc>(context).state;
+                final userTableState =
+                    BlocProvider.of<UserTableBloc>(context).state;
+
+                print(authState is Entered && userTableState is UserDataLoaded);
+
+                if (authState is Entered && userTableState is UserDataLoaded) {
+                  final navigator = Navigator.of(context);
+
+                  final streamList = await userTableState.stream.toList();
+
+                  final last = streamList.last;
+
+                  if (navigator.canPop()) {
+                    navigator.pop();
+                  }
+
+                  navigator.pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => GroupTablePage(
+                        snapshot: last,
+                      ),
+                    ),
+                  );
+                }
+              }
+            })), // Link Bloc
         ),
         BlocProvider<UserTableBloc>(
           create: (context) => sl<UserTableBloc>(),
@@ -50,7 +83,64 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  Timer _timerLink;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      print('resumed');
+      _timerLink = new Timer(const Duration(milliseconds: 850), () {
+        BlocProvider.of<DynamicLinkBloc>(context)
+            .add(LoadInitialLink((event) async {
+          if (event is PendingDynamicLinkData) {
+            final authState =
+                BlocProvider.of<AuthenticationBloc>(context).state;
+            final userTableState =
+                BlocProvider.of<UserTableBloc>(context).state;
+
+            print(authState is Entered && userTableState is UserDataLoaded);
+
+            if (authState is Entered && userTableState is UserDataLoaded) {
+              final navigator = Navigator.of(context);
+
+              final streamList = await userTableState.stream.toList();
+
+              final last = streamList.last;
+
+              if (navigator.canPop()) {
+                navigator.pop();
+              }
+
+              navigator.pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => GroupTablePage(
+                    snapshot: last,
+                  ),
+                ),
+              );
+            }
+          }
+        }));
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    if (_timerLink != null) {
+      _timerLink.cancel();
+    }
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -124,26 +214,42 @@ class _MyAppState extends State<MyApp> {
               if (authState is Entered && userTableState is UserDataLoaded) {
                 final navigator = Navigator.of(context);
 
+                final streamList = await userTableState.stream.toList();
+
+                final last = streamList.last;
+
                 if (navigator.canPop()) {
                   navigator.pop();
                 }
 
-                navigator.pushReplacementNamed('/group-table-page');
+                navigator.pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => GroupTablePage(
+                      snapshot: last,
+                    ),
+                  ),
+                );
               }
             }
           },
           child: BlocListener<DynamicLinkBloc, DynamicLinkState>(
-            listener: (context, state) {
+            listener: (context, state) async {
               if (state is LoadLinkHandlerSuccess) {
-                state.stream.listen(
-                  (event) {
-                    BlocProvider.of<GroupTableBloc>(context).add(
-                      LoadGroupSnapshots(
-                        event.queryParameters['group_name'],
-                      ),
-                    );
-                  },
-                );
+                await Future.delayed(Duration(seconds: 5));
+
+                final authState =
+                    BlocProvider.of<AuthenticationBloc>(context).state;
+
+                if (authState is Entered) {
+                  final groupName = state.uri.queryParameters['group_name'];
+
+                  BlocProvider.of<GroupTableBloc>(context).add(
+                    LoadGroupSnapshots(
+                      groupName,
+                    ),
+                  );
+                } else
+                  Navigator.of(context).pushReplacementNamed('/sign-in');
               }
             },
             child: BlocBuilder<DynamicLinkBloc, DynamicLinkState>(

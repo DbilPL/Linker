@@ -14,9 +14,9 @@ import 'package:linker/features/authentication/presentation/bloc/bloc.dart';
 import 'package:linker/features/group_table/data/datasources/group_table_data_source.dart';
 import 'package:linker/features/group_table/data/respositories/group_table_repository_impl.dart';
 import 'package:linker/features/group_table/domain/usecases/create_new_group.dart';
-import 'package:linker/features/group_table/domain/usecases/dynamic_link_stream.dart';
 import 'package:linker/features/group_table/domain/usecases/generate_joining_link.dart';
 import 'package:linker/features/group_table/domain/usecases/get_group_table_stream.dart';
+import 'package:linker/features/group_table/domain/usecases/retrieve_dynamic_link.dart';
 import 'package:linker/features/group_table/domain/usecases/update_group_table_data.dart';
 import 'package:linker/features/group_table/presentation/bloc/group_table_bloc.dart';
 import 'package:linker/features/table/data/datasources/user_table_data_source.dart';
@@ -71,8 +71,11 @@ Future<void> init() async {
   sl.registerSingleton(UpdateGroupTableData(sl<GroupTableRepositoryImpl>()));
   sl.registerSingleton(GenerateJoiningLink(sl<GroupTableRepositoryImpl>()));
   sl.registerSingleton(CreateNewGroup(sl<GroupTableRepositoryImpl>()));
-  sl.registerSingleton(DynamicLinkStream(sl<GroupTableRepositoryImpl>()));
-  sl.registerSingleton(DynamicLinkBloc(sl<DynamicLinkStream>()));
-  sl.registerSingleton(GroupTableBloc(sl<GetGroupTableStream>(),
-      sl<CreateNewGroup>(), sl<UpdateGroupTableData>()));
+  sl.registerSingleton(RetrieveDynamicLink(sl<GroupTableRepositoryImpl>()));
+  sl.registerSingleton(DynamicLinkBloc(sl<RetrieveDynamicLink>()));
+  sl.registerSingleton(GroupTableBloc(
+      sl<GetGroupTableStream>(),
+      sl<CreateNewGroup>(),
+      sl<UpdateGroupTableData>(),
+      sl<GenerateJoiningLink>()));
 }

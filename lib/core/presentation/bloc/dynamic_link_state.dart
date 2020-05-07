@@ -5,8 +5,7 @@ abstract class DynamicLinkState extends Equatable {
   const DynamicLinkState();
 }
 
-class
-InitialDynamicLinkState extends DynamicLinkState {
+class InitialDynamicLinkState extends DynamicLinkState {
   @override
   List<Object> get props => [];
 }
@@ -21,10 +20,10 @@ class FailureLinkState extends DynamicLinkState {
 }
 
 class LoadLinkHandlerSuccess extends DynamicLinkState {
-  final Stream<Uri> stream;
+  final Uri uri;
 
-  LoadLinkHandlerSuccess(this.stream);
+  LoadLinkHandlerSuccess(this.uri);
 
   @override
-  List<Object> get props => [stream];
+  List<Object> get props => [uri];
 }
