@@ -44,7 +44,7 @@ class GroupTableDataSourceImpl extends GroupTableDataSource {
       final DynamicLinkParameters parameters = DynamicLinkParameters(
         uriPrefix: 'https://linkerapp.page.link',
         link: Uri.parse(
-            'https://linkerapp.page.link/groups?group_name=$tableName}'),
+            'https://linkerapp.page.link/groups?group_name=$tableName'),
         androidParameters: AndroidParameters(
           packageName: 'com.example.linker',
           minimumVersion: 0,
@@ -134,10 +134,11 @@ class GroupTableDataSourceImpl extends GroupTableDataSource {
       throw Exception();
     }
   }
+
   @override
   Future<void> setOnLinkHandler(Function onSuccess) async {
     try {
-     return firebaseDynamicLinks.onLink(onSuccess: onSuccess);
+      return firebaseDynamicLinks.onLink(onSuccess: onSuccess);
     } catch (E) {
       print(E);
       throw Exception();
