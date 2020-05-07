@@ -23,9 +23,13 @@ abstract class GroupTableDataSource {
   Future<Stream<DocumentSnapshot>> createNewGroup(
       {String uid, String userName, String groupName});
 
-  /// Creates new group in [Firestore] via group name and creator uid
+  /// Gets Firebase Link wich opened app
   /// Throws [Exception], when something went wrong
-  Future<Uri> retrieveDynamicLink(Function onSuccess);
+  Future<Uri> retrieveDynamicLink();
+
+  /// Sets handler on link wich opened app
+  /// Throws [Exception], when something went wrong
+  Future<void> setOnLinkHandler(Function onSuccess);
 }
 
 class GroupTableDataSourceImpl extends GroupTableDataSource {
@@ -115,19 +119,27 @@ class GroupTableDataSourceImpl extends GroupTableDataSource {
   }
 
   @override
-  Future<Uri> retrieveDynamicLink(Function onSuccess) async {
+  Future<Uri> retrieveDynamicLink() async {
     try {
       final PendingDynamicLinkData data =
           await firebaseDynamicLinks.getInitialLink();
-
-      firebaseDynamicLinks.onLink(onSuccess: onSuccess);
-
+      print('event ${data?.link ?? 'wow'}');
       final Uri link = data?.link;
       if (link != null)
         return link;
       else
         throw Exception();
     } catch (E) {
+      print(E);
+      throw Exception();
+    }
+  }
+  @override
+  Future<void> setOnLinkHandler(Function onSuccess) async {
+    try {
+     return firebaseDynamicLinks.onLink(onSuccess: onSuccess);
+    } catch (E) {
+      print(E);
       throw Exception();
     }
   }

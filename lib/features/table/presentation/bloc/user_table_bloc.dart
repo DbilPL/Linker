@@ -249,27 +249,37 @@ class UserTableBloc extends Bloc<UserTableEvent, UserTableState> {
       );
     }
     if (event is AddNewGroupToUserData) {
-      final newUserDataModel = UserDataModel(
-        groupNameList: event.prevUserDataModel.groupNameList
-          ..add(event.groupName),
-        name: event.prevUserDataModel.name,
-        table: UserLinkTableModel(
-          links: event.prevUserDataModel.table.links,
-          types: event.prevUserDataModel.table.types,
-        ),
-      );
+      bool isExist = false;
 
-      final result = await _updateUserData(
-        UpdateUserDataParams(
-          newUserData: newUserDataModel,
-          reference: event.reference,
-        ),
-      );
+      for (int i = 0; i < event.prevUserDataModel.groupNameList.length; i++) {
+        if (event.prevUserDataModel.groupNameList[i] == event.groupName) {
+          isExist = true;
+        }
+      }
+      if (!isExist) {
+        final newUserDataModel = UserDataModel(
+          groupNameList: event.prevUserDataModel.groupNameList
+            ..add(event.groupName),
+          name: event.prevUserDataModel.name,
+          table: UserLinkTableModel(
+            links: event.prevUserDataModel.table.links,
+            types: event.prevUserDataModel.table.types,
+          ),
+        );
 
-      yield result.fold(
-        (failure) => FailureUserTableState(failure.error),
-        (success) => UserDataLoaded(null),
-      );
+        final result = await _updateUserData(
+          UpdateUserDataParams(
+            newUserData: newUserDataModel,
+            reference: event.reference,
+          ),
+        );
+
+        yield result.fold(
+          (failure) => FailureUserTableState(failure.error),
+          (success) => UserDataLoaded(null),
+        );
+      } else
+        yield FailureUserTableState('You are already in this group!');
     }
   }
 }

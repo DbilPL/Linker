@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:linker/core/presentation/bloc/dynamic_link_bloc.dart';
+import 'package:linker/core/presentation/bloc/dynamic_link_event.dart';
 import 'package:linker/core/presentation/pages/loading_page.dart';
 import 'package:linker/features/authentication/presentation/bloc/authentication_bloc.dart';
 import 'package:linker/features/authentication/presentation/bloc/bloc.dart';
@@ -28,6 +33,7 @@ class _UserPageState extends State<UserPage> {
       BlocProvider.of<UserTableBloc>(context)
           .add(LoadUserDataInitial(authState.userModel.uid));
     }
+
     super.initState();
   }
 
@@ -81,6 +87,33 @@ class _UserPageState extends State<UserPage> {
                         if (snapshot.hasData) {
                           final userTableDataFromFirebase =
                               UserDataModel.fromJson(snapshot.data.data);
+
+                          Timer(Duration(seconds: 1), () {
+                            BlocProvider.of<DynamicLinkBloc>(context)
+                                .add(LoadInitialLink());
+                            BlocProvider.of<DynamicLinkBloc>(context)
+                                .add(SetOnLinkHandlerEvent((event) async {
+                              if (event is PendingDynamicLinkData) {
+                                final authState =
+                                    BlocProvider.of<AuthenticationBloc>(context)
+                                        .state;
+
+                                if (authState is Entered) {
+                                  BlocProvider.of<UserTableBloc>(context).add(
+                                    AddNewGroupToUserData(
+                                        event
+                                            .link.queryParameters['group_name'],
+                                        UserDataModel.fromJson(
+                                            snapshot.data.data),
+                                        snapshot.data.reference),
+                                  );
+
+                                  Navigator.of(context)
+                                      .pushReplacementNamed('/groups-list');
+                                }
+                              }
+                            }));
+                          });
 
                           if ((userTableDataFromFirebase != null &&
                               userTableDataFromFirebase.table != null)) {

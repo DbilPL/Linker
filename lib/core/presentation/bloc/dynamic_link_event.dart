@@ -5,10 +5,17 @@ abstract class DynamicLinkEvent extends Equatable {
 }
 
 class LoadInitialLink extends DynamicLinkEvent {
-  final Function function;
+  @override
+  List<Object> get props => [];
+}
 
-  LoadInitialLink(this.function);
+class SetOnLinkHandlerEvent extends DynamicLinkEvent {
+
+  final Function onSuccess;
+
+  SetOnLinkHandlerEvent(this.onSuccess);
 
   @override
-  List<Object> get props => [function];
+  List<Object> get props => [onSuccess];
+
 }

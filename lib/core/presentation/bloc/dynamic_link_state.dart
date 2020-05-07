@@ -10,6 +10,11 @@ class InitialDynamicLinkState extends DynamicLinkState {
   List<Object> get props => [];
 }
 
+class LoadingDynamicLinkState extends DynamicLinkState {
+  @override
+  List<Object> get props => [];
+}
+
 class FailureLinkState extends DynamicLinkState {
   final Failure failure;
 

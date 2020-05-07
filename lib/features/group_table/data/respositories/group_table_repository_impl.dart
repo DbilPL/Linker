@@ -76,10 +76,10 @@ class GroupTableRepositoryImpl extends GroupTableRepository {
   }
 
   @override
-  Future<Either<Failure, Uri>> retrieveDynamicLink(Function onSuccess) async {
+  Future<Either<Failure, Uri>> retrieveDynamicLink() async {
     try {
       if (await connectionChecker.hasConnection) {
-        final link = await dataSource.retrieveDynamicLink(onSuccess);
+        final link = await dataSource.retrieveDynamicLink();
 
         return Right(link);
       } else
@@ -87,5 +87,20 @@ class GroupTableRepositoryImpl extends GroupTableRepository {
     } catch (e) {
       return Left(Failure(error: 'Something went wrong!'));
     }
+  }
+
+  Future<Either<Failure, void>> setOnLinkHandler(Function onSuccess) async {
+
+    try {
+      if (await connectionChecker.hasConnection) {
+        final success = await dataSource.setOnLinkHandler(onSuccess);
+
+        return Right(success);
+      } else
+        return Left(Failure(error: 'Has no connection to internet!'));
+    } catch (e) {
+      return Left(Failure(error: 'Something went wrong!'));
+    }
+
   }
 }

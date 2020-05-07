@@ -18,5 +18,9 @@ abstract class GroupTableRepository {
     String userName,
   });
 
-  Future<Either<Failure, Uri>> retrieveDynamicLink(Function onSuccess);
+  Future<Either<Failure, Uri>> retrieveDynamicLink();
+
+  Future<Either<Failure, void>> setOnLinkHandler(Function onSuccess);
+
+
 }

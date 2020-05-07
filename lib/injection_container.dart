@@ -26,6 +26,8 @@ import 'package:linker/features/table/domain/usecases/update_user_data.dart';
 import 'package:linker/features/table/presentation/bloc/user_table_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'features/group_table/domain/usecases/set_on_link_handler.dart';
+
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -71,8 +73,10 @@ Future<void> init() async {
   sl.registerSingleton(UpdateGroupTableData(sl<GroupTableRepositoryImpl>()));
   sl.registerSingleton(GenerateJoiningLink(sl<GroupTableRepositoryImpl>()));
   sl.registerSingleton(CreateNewGroup(sl<GroupTableRepositoryImpl>()));
+  sl.registerSingleton(SetOnLinkHandler(sl<GroupTableRepositoryImpl>()));
   sl.registerSingleton(RetrieveDynamicLink(sl<GroupTableRepositoryImpl>()));
-  sl.registerSingleton(DynamicLinkBloc(sl<RetrieveDynamicLink>()));
+  sl.registerSingleton(
+      DynamicLinkBloc(sl<RetrieveDynamicLink>(), sl<SetOnLinkHandler>()));
   sl.registerSingleton(GroupTableBloc(
       sl<GetGroupTableStream>(),
       sl<CreateNewGroup>(),
