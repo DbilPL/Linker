@@ -137,42 +137,21 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             Navigator.of(context).pushReplacementNamed('/sign-in');
           }
         },
-        child: BlocListener<DynamicLinkBloc, DynamicLinkState>(
-          listener: (context, state) async {
-            if (state is LoadLinkHandlerSuccess) {
-              final authState =
-                  BlocProvider.of<AuthenticationBloc>(context).state;
-
-              if (authState is Entered) {
-                if (state.uri != null) {
-                  final groupName = state.uri.queryParameters['group_name'];
-
-                  BlocProvider.of<GroupTableBloc>(context).add(
-                    LoadGroupSnapshots(
-                      groupName,
-                    ),
-                  );
-                }
-              } else
-                Navigator.of(context).pushReplacementNamed('/sign-in');
-            }
-          },
-          child: BlocBuilder<DynamicLinkBloc, DynamicLinkState>(
-            builder: (context, state) {
-              return Scaffold(
-                body: Center(
-                  child: Container(
-                    width: 300,
-                    height: 300,
-                    child: FlareActor(
-                      'assets/flare_animations/intro.flr',
-                      animation: 'Untitled',
-                    ),
+        child: BlocBuilder<DynamicLinkBloc, DynamicLinkState>(
+          builder: (context, state) {
+            return Scaffold(
+              body: Center(
+                child: Container(
+                  width: 300,
+                  height: 300,
+                  child: FlareActor(
+                    'assets/flare_animations/intro.flr',
+                    animation: 'Untitled',
                   ),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ),
     );

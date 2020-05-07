@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:linker/core/presentation/bloc/bloc.dart';
 import 'package:linker/core/presentation/bloc/dynamic_link_bloc.dart';
 import 'package:linker/core/presentation/bloc/dynamic_link_event.dart';
 import 'package:linker/core/presentation/pages/loading_page.dart';
@@ -137,148 +138,179 @@ class _UserPageState extends State<UserPage> {
                               }
                             }
 
-                            return Scaffold(
-                              appBar: AppBar(
-                                title: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Container(
-                                      width: 40,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey,
-                                        borderRadius: BorderRadius.circular(25),
-                                      ),
-                                    ),
-                                    Icon(
-                                      Icons.person,
-                                      size: 30,
-                                    ),
-                                  ],
-                                ),
-                                actions: <Widget>[
-                                  Center(
-                                    child: Text(
-                                      isEditing ? 'Complete' : 'Edit',
-                                      style: AppBarTheme.of(context)
-                                          .textTheme
-                                          .subtitle1,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: Icon(
-                                        isEditing ? Icons.check : Icons.edit),
-                                    onPressed: () {
-                                      setState(() {
-                                        isEditing = !isEditing;
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                              drawer: Drawer(
-                                elevation: 0.0,
-                                child: ListView(
-                                  children: [
-                                    UserAccountsDrawerHeader(
-                                      accountName:
-                                          Text(userTableDataFromFirebase.name),
-                                      accountEmail:
-                                          Text(authState.userModel.email),
-                                      currentAccountPicture: Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          Container(
-                                            width: 80,
-                                            height: 80,
-                                            decoration: BoxDecoration(
-                                              color: Colors.grey,
-                                              borderRadius:
-                                                  BorderRadius.circular(40),
-                                            ),
-                                          ),
-                                          Icon(
-                                            Icons.person,
-                                            size: 65,
-                                            color: AppBarTheme.of(context)
-                                                .iconTheme
-                                                .color,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    ListTile(
-                                      onTap: () {
-                                        final authState =
-                                            BlocProvider.of<AuthenticationBloc>(
-                                                    context)
-                                                .state;
+                            return BlocListener<DynamicLinkBloc,
+                                DynamicLinkState>(
+                              listener: (context, state) {
+                                if (state is LoadLinkHandlerSuccess) {
+                                  final authState =
+                                      BlocProvider.of<AuthenticationBloc>(
+                                              context)
+                                          .state;
 
-                                        if (authState is Entered)
-                                          BlocProvider.of<AuthenticationBloc>(
-                                                  context)
-                                              .add(
-                                            SignOutEvent(
-                                              authState.userModel,
-                                            ),
-                                          );
-                                      },
-                                      title: Text(
-                                        'Sign out',
-                                      ),
-                                    ),
-                                    ListTile(
-                                      onTap: () {
-                                        Navigator.of(context).pushReplacement(
-                                          MaterialPageRoute(
-                                            builder: (context) => GroupsList(
-                                              snapshot: snapshot,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      title: Text(
-                                        'Groups',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              bottomNavigationBar: BottomAppBar(
-                                color: Theme.of(context).primaryColor,
-                                child: IconButton(
-                                  icon: Icon(
-                                    Icons.add_circle_outline,
-                                    size: 37,
-                                    color: Theme.of(context).backgroundColor,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) => AddLinkGroupPage(
-                                          snapshot: snapshot.data,
+                                  if (authState is Entered) {
+                                    if (state.uri != null) {
+                                      final groupName = state
+                                          .uri.queryParameters['group_name'];
+
+                                      BlocProvider.of<UserTableBloc>(context)
+                                          .add(
+                                        AddNewGroupToUserData(
+                                            groupName,
+                                            UserDataModel.fromJson(
+                                                snapshot.data.data),
+                                            snapshot.data.reference),
+                                      );
+
+                                      Navigator.of(context)
+                                          .pushReplacementNamed('/groups-list');
+                                    }
+                                  }
+                                }
+                              },
+                              child: Scaffold(
+                                appBar: AppBar(
+                                  title: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Container(
+                                        width: 40,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey,
+                                          borderRadius:
+                                              BorderRadius.circular(25),
                                         ),
                                       ),
-                                    );
-                                  },
-                                ),
-                              ),
-                              body: types == []
-                                  ? Center(
-                                      child: Text('No data!'),
-                                    )
-                                  : ListView.builder(
-                                      itemCount: types.length,
-                                      itemBuilder:
-                                          (BuildContext context, int index) {
-                                        return LinkGroupView(
-                                          links: sortedLinks[index],
-                                          type: types[index],
-                                          snapshot: snapshot.data,
-                                          isEditing: isEditing,
-                                        );
+                                      Icon(
+                                        Icons.person,
+                                        size: 30,
+                                      ),
+                                    ],
+                                  ),
+                                  actions: <Widget>[
+                                    Center(
+                                      child: Text(
+                                        isEditing ? 'Complete' : 'Edit',
+                                        style: AppBarTheme.of(context)
+                                            .textTheme
+                                            .subtitle1,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(
+                                          isEditing ? Icons.check : Icons.edit),
+                                      onPressed: () {
+                                        setState(() {
+                                          isEditing = !isEditing;
+                                        });
                                       },
                                     ),
+                                  ],
+                                ),
+                                drawer: Drawer(
+                                  elevation: 0.0,
+                                  child: ListView(
+                                    children: [
+                                      UserAccountsDrawerHeader(
+                                        accountName: Text(
+                                            userTableDataFromFirebase.name),
+                                        accountEmail:
+                                            Text(authState.userModel.email),
+                                        currentAccountPicture: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Container(
+                                              width: 80,
+                                              height: 80,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey,
+                                                borderRadius:
+                                                    BorderRadius.circular(40),
+                                              ),
+                                            ),
+                                            Icon(
+                                              Icons.person,
+                                              size: 65,
+                                              color: AppBarTheme.of(context)
+                                                  .iconTheme
+                                                  .color,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      ListTile(
+                                        onTap: () {
+                                          final authState = BlocProvider.of<
+                                                  AuthenticationBloc>(context)
+                                              .state;
+
+                                          if (authState is Entered)
+                                            BlocProvider.of<AuthenticationBloc>(
+                                                    context)
+                                                .add(
+                                              SignOutEvent(
+                                                authState.userModel,
+                                              ),
+                                            );
+                                        },
+                                        title: Text(
+                                          'Sign out',
+                                        ),
+                                      ),
+                                      ListTile(
+                                        onTap: () {
+                                          Navigator.of(context).pushReplacement(
+                                            MaterialPageRoute(
+                                              builder: (context) => GroupsList(
+                                                snapshot: snapshot,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        title: Text(
+                                          'Groups',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                bottomNavigationBar: BottomAppBar(
+                                  color: Theme.of(context).primaryColor,
+                                  child: IconButton(
+                                    icon: Icon(
+                                      Icons.add_circle_outline,
+                                      size: 37,
+                                      color: Theme.of(context).backgroundColor,
+                                    ),
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              AddLinkGroupPage(
+                                            snapshot: snapshot.data,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                body: types == []
+                                    ? Center(
+                                        child: Text('No data!'),
+                                      )
+                                    : ListView.builder(
+                                        itemCount: types.length,
+                                        itemBuilder:
+                                            (BuildContext context, int index) {
+                                          return LinkGroupView(
+                                            links: sortedLinks[index],
+                                            type: types[index],
+                                            snapshot: snapshot.data,
+                                            isEditing: isEditing,
+                                          );
+                                        },
+                                      ),
+                              ),
                             );
                           } else
                             return Center(
