@@ -278,8 +278,10 @@ class UserTableBloc extends Bloc<UserTableEvent, UserTableState> {
           (failure) => FailureUserTableState(failure.error),
           (success) => UserDataLoaded(null),
         );
-      } else
+      } else {
+        print('You are already in this group!');
         yield FailureUserTableState('You are already in this group!');
+      }
     }
   }
 }

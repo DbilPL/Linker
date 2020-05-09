@@ -67,6 +67,16 @@ class _UserPageState extends State<UserPage> {
                   stream = state.stream;
                 });
             }
+            if (state is FailureUserTableState) {
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Theme.of(context).errorColor,
+                  content: Text(
+                    state.message,
+                  ),
+                ),
+              );
+            }
           },
           child: BlocBuilder<UserTableBloc, UserTableState>(
             builder: (context, state) {
@@ -89,32 +99,36 @@ class _UserPageState extends State<UserPage> {
                           final userTableDataFromFirebase =
                               UserDataModel.fromJson(snapshot.data.data);
 
-                          Timer(Duration(seconds: 1), () {
-                            BlocProvider.of<DynamicLinkBloc>(context)
-                                .add(LoadInitialLink());
-                            BlocProvider.of<DynamicLinkBloc>(context)
-                                .add(SetOnLinkHandlerEvent((event) async {
-                              if (event is PendingDynamicLinkData) {
-                                final authState =
-                                    BlocProvider.of<AuthenticationBloc>(context)
-                                        .state;
-
-                                if (authState is Entered) {
-                                  BlocProvider.of<UserTableBloc>(context).add(
-                                    AddNewGroupToUserData(
+                          BlocProvider.of<DynamicLinkBloc>(context)
+                              .add(LoadInitialLink());
+                          BlocProvider.of<DynamicLinkBloc>(context).add(
+                            SetOnLinkHandlerEvent(
+                              (event) async {
+                                if (event is PendingDynamicLinkData) {
+                                  if (event.link != null) {
+                                    await Future.delayed(Duration(seconds: 1));
+                                    BlocProvider.of<UserTableBloc>(context).add(
+                                      AddNewGroupToUserData(
                                         event
                                             .link.queryParameters['group_name'],
                                         UserDataModel.fromJson(
                                             snapshot.data.data),
-                                        snapshot.data.reference),
-                                  );
-
-                                  Navigator.of(context)
-                                      .pushReplacementNamed('/groups-list');
+                                        snapshot.data.reference,
+                                      ),
+                                    );
+                                    await Future.delayed(Duration(seconds: 1));
+                                    Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(
+                                        builder: (context) => GroupsList(
+                                          snapshot: snapshot,
+                                        ),
+                                      ),
+                                    );
+                                  }
                                 }
-                              }
-                            }));
-                          });
+                              },
+                            ),
+                          );
 
                           if ((userTableDataFromFirebase != null &&
                               userTableDataFromFirebase.table != null)) {
@@ -142,28 +156,26 @@ class _UserPageState extends State<UserPage> {
                                 DynamicLinkState>(
                               listener: (context, state) {
                                 if (state is LoadLinkHandlerSuccess) {
-                                  final authState =
-                                      BlocProvider.of<AuthenticationBloc>(
-                                              context)
-                                          .state;
+                                  if (state.uri != null) {
+                                    final groupName =
+                                        state.uri.queryParameters['group_name'];
 
-                                  if (authState is Entered) {
-                                    if (state.uri != null) {
-                                      final groupName = state
-                                          .uri.queryParameters['group_name'];
+                                    BlocProvider.of<UserTableBloc>(context).add(
+                                      AddNewGroupToUserData(
+                                        groupName,
+                                        UserDataModel.fromJson(
+                                            snapshot.data.data),
+                                        snapshot.data.reference,
+                                      ),
+                                    );
 
-                                      BlocProvider.of<UserTableBloc>(context)
-                                          .add(
-                                        AddNewGroupToUserData(
-                                            groupName,
-                                            UserDataModel.fromJson(
-                                                snapshot.data.data),
-                                            snapshot.data.reference),
-                                      );
-
-                                      Navigator.of(context)
-                                          .pushReplacementNamed('/groups-list');
-                                    }
+                                    Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(
+                                        builder: (context) => GroupsList(
+                                          snapshot: snapshot,
+                                        ),
+                                      ),
+                                    );
                                   }
                                 }
                               },
